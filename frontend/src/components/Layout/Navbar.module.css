@@ -1,0 +1,269 @@
+.navbar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: rgba(255, 250, 240, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(183, 110, 121, 0.15);
+    transition: all 0.3s ease;
+}
+
+.scrolled {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background-color: rgba(255, 255, 255, 0.98);
+}
+
+.navContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+}
+
+.brandPrimary {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+}
+
+.brandSub {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.desktopMenu {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.navLink {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text-dark);
+    position: relative;
+    padding: 0.4rem 0;
+    transition: color 0.2s;
+}
+
+.navLink:hover,
+.active {
+    color: var(--color-primary);
+}
+
+.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-primary);
+    border-radius: 2px;
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.iconBtn {
+    position: relative;
+    color: var(--color-text-dark);
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, background 0.2s;
+}
+
+.iconBtn:hover {
+    color: var(--color-primary);
+    background-color: rgba(183, 110, 121, 0.1);
+}
+
+.badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background-color: var(--color-primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.userMenuWrapper {
+    position: relative;
+}
+
+.loginBtn {
+    padding: 0.4rem 1.25rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.loginBtn:hover {
+    background-color: #a05a65;
+}
+
+.userBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
+    border: 1px solid rgba(183, 110, 121, 0.3);
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    cursor: pointer;
+    color: var(--color-text-dark);
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.userDropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 220px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: 10001;
+}
+
+.userDropdownHeader {
+    padding: 0.5rem;
+}
+
+.userRoleTag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: 1px;
+}
+
+.userEmail {
+    font-size: 0.8rem;
+    color: #666;
+    word-break: break-all;
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+    color: var(--color-text-dark);
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.dropdownItem:hover {
+    background-color: #f8fafc;
+    color: var(--color-primary);
+}
+
+.dropdownItemLogout {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+    color: #dc2626;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+
+.dropdownItemLogout:hover {
+    background-color: #fee2e2;
+}
+
+.menuToggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-dark);
+}
+
+@media (max-width: 960px) {
+    .desktopMenu {
+        display: none;
+    }
+
+    .menuToggle {
+        display: block;
+    }
+
+    .mobileMenu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+    }
+
+    .mobileMenu ul {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .mobileLink {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--color-text-dark);
+    }
+
+    .mobileBtn {
+        width: 100%;
+        padding: 0.8rem;
+        background-color: var(--color-primary);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: center;
+    }
+}

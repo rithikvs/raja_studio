@@ -1,0 +1,35 @@
+:root {
+    /* Colors */
+    --color-primary: #B76E79;
+    /* Rose Gold */
+    --color-secondary: #FFD1DC;
+    /* Pastel Pink */
+    --color-accent: #F5F5DC;
+    /* Cream/Beige */
+    --color-text-dark: #4A4036;
+    /* Soft Brown */
+    --color-text-light: #FDFBF7;
+    /* Off-white for dark backgrounds */
+    --color-white: #FFFFFF;
+    --color-bg-light: #FFFAF0;
+    /* Floral White */
+
+    /* Fonts */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Poppins', sans-serif;
+
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 2rem;
+    --spacing-lg: 4rem;
+    --spacing-xl: 6rem;
+
+    /* Transitions */
+    --transition-fast: 0.3s ease;
+    --transition-medium: 0.5s ease-in-out;
+
+    /* Shadows */
+    --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
+}

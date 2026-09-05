@@ -1,0 +1,691 @@
+.ordersPage {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.header h1 {
+    font-size: 1.8rem;
+    color: #1e293b;
+    font-family: var(--font-heading);
+}
+
+.header p {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.toolbar {
+    display: flex;
+    gap: 1rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.searchBox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.searchBox svg {
+    position: absolute;
+    left: 0.75rem;
+    color: #94a3b8;
+}
+
+.searchBox input {
+    width: 100%;
+    padding: 0.6rem 0.75rem 0.6rem 2.4rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    font-family: var(--font-body);
+}
+
+.toolbar select {
+    padding: 0.6rem 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+}
+
+.tableCard {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.dataTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.dataTable th {
+    background-color: #f8fafc;
+    padding: 0.85rem;
+    text-align: left;
+    color: #475569;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.dataTable td {
+    padding: 0.85rem;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+}
+
+.dateText,
+.subText {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.itemSummaryBox {
+    background-color: #f8fafc;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    margin-bottom: 0.4rem;
+}
+
+.optText {
+    font-size: 0.75rem;
+    color: #475569;
+}
+
+.customText {
+    font-size: 0.75rem;
+    color: var(--color-primary);
+}
+
+.photoDownloadBox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #fffaf0;
+    border: 1px solid var(--color-secondary);
+    padding: 0.4rem;
+    border-radius: 8px;
+    margin-bottom: 0.4rem;
+}
+
+.photoThumb {
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.qualityTag {
+    display: block;
+    font-size: 0.65rem;
+    color: #166534;
+    font-weight: 700;
+}
+
+.downloadBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 0.2rem;
+}
+
+.noPhotoTag {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.totalCol {
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.statusSelect {
+    padding: 0.35rem 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.8rem;
+
+    background-color: #f8fafc;
+}
+
+.actionRow {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.viewBtn {
+    padding: 0.35rem 0.6rem;
+    background-color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.invoiceBtn {
+    padding: 0.35rem 0.6rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 4rem;
+    color: #94a3b8;
+}
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    padding: 1.5rem;
+}
+
+.modal {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 760px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+}
+
+.modalGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.statusBadge {
+    background: #dcfce7;
+    color: #166534;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.modalDivider {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 1.5rem 0;
+}
+
+.photoGalleryModal {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.photoCardModal {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.photoCardModal img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.pCardModalBody {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+}
+
+.modalDownloadBtn {
+    margin-top: 0.5rem;
+    padding: 0.4rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.closeModalBtn {
+    padding: 0.6rem 1.5rem;
+    background: #cbd5e1;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+}
+.refreshBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.refreshBtn:hover:not(:disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.refreshBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.sourceStats {
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #64748b;
+    background: #f8fafc;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.sourceTag {
+    font-size: 0.7rem;
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    margin-top: 0.25rem;
+}
+
+/* Delete Button */
+.deleteBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem 0.6rem;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.deleteBtn:hover {
+    background: #fecaca;
+    border-color: #dc2626;
+}
+
+/* Enhanced Modal Styles */
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.closeIcon {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.closeIcon:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.orderInfoBanner {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.infoBannerItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.infoBannerItem .label {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.infoBannerItem .value {
+    font-size: 0.9rem;
+    color: #1e293b;
+    font-weight: 500;
+}
+
+.modalSection {
+    margin-bottom: 1.5rem;
+}
+
+.modalSection h3 {
+    font-size: 1rem;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-heading);
+}
+
+.detailsBox {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.detailsBox p {
+    margin: 0.5rem 0;
+    color: #475569;
+}
+
+.detailsBox strong {
+    color: #1e293b;
+}
+
+.itemsDetailList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.itemDetailCard {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.itemDetailHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.itemDetailHeader strong {
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+.itemDetailHeader span {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.itemOptions {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.itemOptions ul {
+    margin: 0.5rem 0 0 1.5rem;
+    list-style: disc;
+}
+
+.itemOptions li {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin: 0.25rem 0;
+}
+
+.itemCustomText {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e2e8f0;
+    font-style: italic;
+    color: #64748b;
+}
+
+.orderSummary {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.summaryRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.summaryRow:last-child {
+    border-bottom: none;
+}
+
+.summaryRow.totalRow {
+    padding-top: 1rem;
+    border-top: 2px solid #cbd5e1;
+    font-size: 1.1rem;
+}
+
+.summaryRow .discount {
+    color: #10b981;
+}
+
+.notesBox {
+    background: #fef3c7;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #fde68a;
+    color: #78350f;
+    font-style: italic;
+}
+
+.statusPaymentGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.statusPaymentGrid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.historyList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.historyItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-radius: 6px;
+    border-left: 3px solid var(--primary);
+}
+
+.historyStatus {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.historyDate {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.modalFooter {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e2e8f0;
+}
+
+.printInvoiceBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.2s ease;
+}
+
+.printInvoiceBtn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.deleteOrderBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.2s ease;
+}
+
+.deleteOrderBtn:hover {
+    background: #fecaca;
+    border-color: #dc2626;
+}
+
+.closeModalBtn {
+    padding: 0.75rem 1.25rem;
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.2s ease;
+}
+
+.closeModalBtn:hover {
+    background: #e2e8f0;
+}
+
+/* Spinning animation for refresh button */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+.refreshBtn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.refreshBtn:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.refreshBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

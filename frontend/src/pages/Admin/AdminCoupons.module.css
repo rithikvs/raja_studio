@@ -1,0 +1,176 @@
+.couponsPage {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.topHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topHeader h1 {
+    font-size: 1.8rem;
+    color: #1e293b;
+    font-family: var(--font-heading);
+}
+
+.topHeader p {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.addBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.couponCard {
+    background: white;
+    border: 2px dashed var(--color-primary);
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.couponHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.icon {
+    color: var(--color-primary);
+}
+
+.code {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.discountText {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #166534;
+}
+
+.minVal {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.deleteBtn {
+    margin-top: 0.5rem;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 0.4rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 4rem;
+    color: #94a3b8;
+    background: white;
+    border-radius: 12px;
+}
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    padding: 1.5rem;
+}
+
+.modal {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 440px;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+}
+
+.group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.group input,
+.group select {
+    padding: 0.7rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-family: var(--font-body);
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.cancelBtn {
+    padding: 0.75rem 1.5rem;
+    background: #e2e8f0;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+.saveBtn {
+    padding: 0.75rem 2rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+}

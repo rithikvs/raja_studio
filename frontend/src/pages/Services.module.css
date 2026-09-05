@@ -1,0 +1,232 @@
+.servicesPage {
+    min-height: 80vh;
+}
+
+.pageHeader {
+    background: linear-gradient(135deg, #B76E79, #a05a65);
+    color: white;
+    padding: 3.5rem 0;
+    text-align: center;
+}
+
+.pageHeader h1 {
+    font-size: 2.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.pageHeader p {
+    font-size: 1.15rem;
+    opacity: 0.95;
+}
+
+/* Services Grid */
+.servicesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    margin-top: 3rem;
+}
+
+.serviceCard {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border: 1px solid #f1f5f9;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.serviceCard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+}
+
+.iconWrapper {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #B76E79, #a05a65);
+    color: white;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+}
+
+.serviceCard h3 {
+    font-size: 1.5rem;
+    color: #1e293b;
+    margin-bottom: 1rem;
+}
+
+.description {
+    color: #64748b;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.featuresList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.featuresList li {
+    color: #475569;
+    font-size: 0.95rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid #f1f5f9;
+}
+
+.featuresList li:first-child {
+    border-top: none;
+}
+
+/* Process Section */
+.processGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.processStep {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #f1f5f9;
+    position: relative;
+}
+
+.stepNumber {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #B76E79, #a05a65);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(183, 110, 121, 0.3);
+}
+
+.processStep h3 {
+    font-size: 1.25rem;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+}
+
+.processStep p {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Features Grid */
+.featuresGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2.5rem;
+    margin-top: 3rem;
+}
+
+.feature {
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.feature h3 {
+    font-size: 1.25rem;
+    color: #1e293b;
+    margin: 1rem 0 0.75rem;
+}
+
+.feature p {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* CTA Section */
+.ctaSection {
+    background: linear-gradient(135deg, #B76E79, #a05a65);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.ctaSection h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.ctaSection p {
+    font-size: 1.15rem;
+    opacity: 0.95;
+    margin-bottom: 2rem;
+}
+
+.ctaButtons {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.primaryBtn,
+.secondaryBtn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.primaryBtn {
+    background: white;
+    color: #B76E79;
+}
+
+.secondaryBtn {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid white;
+}
+
+.primaryBtn:hover,
+.secondaryBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pageHeader h1 {
+        font-size: 2rem;
+    }
+
+    .servicesGrid,
+    .processGrid,
+    .featuresGrid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .ctaSection h2 {
+        font-size: 1.75rem;
+    }
+
+    .ctaButtons {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0 2rem;
+    }
+}

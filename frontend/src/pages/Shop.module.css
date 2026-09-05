@@ -1,0 +1,257 @@
+.shopPage {
+    min-height: 80vh;
+}
+
+.pageHeader {
+    background: linear-gradient(135deg, var(--color-primary), #a05a65);
+    color: white;
+    padding: 3.5rem 0;
+    text-align: center;
+}
+
+.pageHeader h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.pageHeader p {
+    font-size: 1.05rem;
+    opacity: 0.9;
+}
+
+.shopLayout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 2.5rem;
+}
+
+@media (max-width: 900px) {
+    .shopLayout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+}
+
+.filterSection {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #f0f0f0;
+}
+
+.filterTitle {
+    font-size: 1rem;
+    color: var(--color-text-dark);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+}
+
+.searchBox {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 0.75rem;
+    color: #999;
+}
+
+.searchBox input {
+    width: 100%;
+    padding: 0.6rem 0.75rem 0.6rem 2.4rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    font-family: var(--font-body);
+}
+
+.categoryList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.categoryList li {
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #555;
+    transition: background 0.2s, color 0.2s;
+}
+
+.categoryList li:hover {
+    background-color: #f8fafc;
+    color: var(--color-primary);
+}
+
+.activeCat {
+    background-color: var(--color-secondary) !important;
+    color: var(--color-text-dark) !important;
+    font-weight: 600;
+}
+
+.rangeSlider {
+    width: 100%;
+    accent-color: var(--color-primary);
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #f0f0f0;
+}
+
+.sortBox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sortBox select {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: var(--font-body);
+    outline: none;
+}
+
+.productsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.75rem;
+}
+
+.productCard {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.productCard:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.productImageWrapper {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background-color: #f8fafc;
+    overflow: hidden;
+}
+
+.productImageWrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.wishlistBtn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: white;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.productContent {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+}
+
+.categoryTag {
+    font-size: 0.75rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.productName {
+    font-size: 1.1rem;
+    margin: 0.25rem 0 0.5rem;
+    font-family: var(--font-heading);
+}
+
+.priceRow {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.salePrice {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.regularPrice {
+    font-size: 0.85rem;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.customizeBtn {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+}
+
+.customizeBtn:hover {
+    background-color: #a05a65;
+}
+
+.emptyState {
+    background: white;
+    border: 2px dashed #e2e8f0;
+    padding: 4rem 2rem;
+    border-radius: 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}

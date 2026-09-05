@@ -1,0 +1,16 @@
+{
+  "name": "raja-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Raja Studio - Personalized Photo Gifts & Frames",
+  "scripts": {
+    "install:all": "npm install --prefix frontend && npm install --prefix backend",
+    "frontend": "npm run dev --prefix frontend",
+    "backend": "npm run dev --prefix backend",
+    "dev": "concurrently -n \"FRONTEND,BACKEND\" -c \"magenta,blue\" \"npm run frontend\" \"npm run backend\"",
+    "cleanup:addresses": "npm run cleanup:addresses --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}

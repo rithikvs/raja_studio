@@ -1,0 +1,510 @@
+.dashboardPage {
+    min-height: 80vh;
+}
+
+.pageHeader {
+    background: linear-gradient(135deg, var(--color-primary), #a05a65);
+    color: white;
+    padding: 2.5rem 0;
+    text-align: center;
+}
+
+.pageHeader h1 {
+    font-size: 2rem;
+}
+
+.dashboardLayout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2.5rem;
+}
+
+@media (max-width: 900px) {
+    .dashboardLayout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.sidebar {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: fit-content;
+}
+
+.userInfoBox {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.userInfoBox h3 {
+    font-size: 1rem;
+    color: var(--color-text-dark);
+}
+
+.userInfoBox p {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.navMenuList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.navMenuList li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.navMenuList li:hover {
+    background-color: #f8fafc;
+    color: var(--color-primary);
+}
+
+.activeTab {
+    background-color: var(--color-secondary) !important;
+    color: var(--color-text-dark) !important;
+    font-weight: 700 !important;
+}
+
+.logoutBtn {
+    color: #dc2626 !important;
+    margin-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 1rem !important;
+}
+
+.mainContent {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #f0f0f0;
+}
+
+.tabSection h2 {
+    font-size: 1.5rem;
+    color: var(--color-text-dark);
+    margin-bottom: 1.5rem;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.statCard {
+    background-color: #fffaf0;
+    border: 1px solid var(--color-secondary);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.statCard h3 {
+    font-size: 2.2rem;
+    color: var(--color-primary);
+}
+
+.statCard p {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.dashTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.dashTable th {
+    background-color: #f1f5f9;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.dashTable td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.statusBadge {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.invoiceSmallBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.75rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.tabHeaderFlex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.dashSearchRow {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.searchBox {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.searchBox svg {
+    position: absolute;
+    left: 0.75rem;
+    color: #999;
+}
+
+.searchBox input {
+    padding: 0.5rem 0.75rem 0.5rem 2.2rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-family: var(--font-body);
+}
+
+.dashSearchRow select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+}
+
+.productsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.25rem;
+}
+
+.productCard {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.productCard img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+}
+
+.pCardBody {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex-grow: 1;
+}
+
+.pCardBody h4 {
+    font-size: 0.9rem;
+
+}
+
+.customizeSmallBtn {
+    margin-top: auto;
+    padding: 0.4rem;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.categoryCardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.catCard {
+    height: 180px;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+}
+
+.catCard img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.catCard h3 {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    color: white;
+    padding: 1rem;
+    font-size: 1.1rem;
+}
+
+.photoGalleryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.25rem;
+}
+
+.photoItemCard {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.photoItemCard img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.photoMeta {
+    padding: 0.5rem;
+}
+
+.pProdName {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.pQualityTag {
+    font-size: 0.7rem;
+    color: #166534;
+}
+
+.emptyText {
+    color: #94a3b8;
+    text-align: center;
+    padding: 3rem;
+}
+
+.loginRequired {
+    text-align: center;
+    padding: 5rem 1rem;
+}
+
+.homeLink {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.75rem 2rem;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+/* Product Grid Styles */
+.productsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.productCard {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.productCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.productCard img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.pCardBody {
+    padding: 1rem;
+}
+
+.pCardBody h4 {
+    font-size: 1rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.productPrice {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.productActions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.customizeBtn {
+    flex: 1;
+    background: var(--color-primary);
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.customizeBtn:hover {
+    background: #a05a65;
+}
+
+.wishlistBtn {
+    background: transparent;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #64748b;
+}
+
+.wishlistBtn:hover,
+.wishlistBtn.inWishlist {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: #fef7f7;
+}
+
+/* Quick Actions Grid */
+.quickActionsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.quickActionCard {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    text-decoration: none;
+    color: #475569;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.quickActionCard:hover {
+    border-color: var(--color-primary);
+    background: #fef7f7;
+    transform: translateY(-2px);
+}
+
+.quickActionCard h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+    color: #1e293b;
+}
+
+.quickActionCard p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+/* Empty States */
+.emptyOrdersState,
+.emptyProductsState {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #94a3b8;
+}
+
+.emptyOrdersState p,
+.emptyProductsState p {
+    margin: 1rem 0;
+    font-size: 1rem;
+}
+
+.shopNowBtn {
+    background: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 1rem;
+    transition: background 0.2s ease;
+}
+
+.shopNowBtn:hover {
+    background: #a05a65;
+}
+
+/* Welcome Text */
+.welcomeText {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}

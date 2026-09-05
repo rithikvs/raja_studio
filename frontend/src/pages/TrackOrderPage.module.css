@@ -1,0 +1,193 @@
+.trackPage {
+    min-height: 80vh;
+}
+
+.pageHeader {
+    background: linear-gradient(135deg, var(--color-primary), #a05a65);
+    color: white;
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.pageHeader h1 {
+    font-size: 2.2rem;
+}
+
+.trackCard {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    max-width: 900px;
+    margin: 0 auto;
+    border: 1px solid #f0f0f0;
+}
+
+.searchForm {
+    display: flex;
+    gap: 1rem;
+}
+
+@media (max-width: 600px) {
+    .searchForm {
+        flex-direction: column;
+    }
+}
+
+.inputGroup {
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+.icon {
+    position: absolute;
+    left: 1rem;
+    color: #999;
+}
+
+.inputGroup input {
+    width: 100%;
+    padding: 0.85rem 1rem 0.85rem 2.8rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    outline: none;
+}
+
+.inputGroup input:focus {
+    border-color: var(--color-primary);
+}
+
+.trackBtn {
+    padding: 0.85rem 2rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.resultsArea {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.orderMetaRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.customerMeta,
+.dateMeta {
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.currentStatusBadge {
+    background-color: #dcfce7;
+    color: #166534;
+    padding: 0.6rem 1.25rem;
+    border-radius: 50px;
+    font-size: 0.95rem;
+}
+
+.timelineTitle {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-text-dark);
+}
+
+.timelineGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.timelineStep {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+    opacity: 0.4;
+}
+
+.completed {
+    opacity: 1;
+    color: #166534;
+}
+
+.active {
+    opacity: 1;
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.stepDot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.completed .stepDot {
+    background-color: #166534;
+    color: white;
+}
+
+.active .stepDot {
+    background-color: var(--color-primary);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(183, 110, 121, 0.25);
+}
+
+.stepName {
+    font-size: 0.75rem;
+}
+
+.itemsBox h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.itemsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.itemCard {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: #f8fafc;
+    padding: 0.75rem;
+    border-radius: 8px;
+}
+
+.itemCard img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.notFoundBox {
+    text-align: center;
+    padding: 2rem;
+    color: #94a3b8;
+}

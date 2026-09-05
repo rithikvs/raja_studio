@@ -1,0 +1,113 @@
+.detailsPage {
+    min-height: 80vh;
+    background-color: var(--color-bg-light);
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-text-dark);
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    transition: color 0.2s;
+}
+
+.backLink:hover {
+    color: var(--color-primary);
+}
+
+.headerInfo {
+    margin-bottom: 1rem;
+}
+
+.catBadge {
+    display: inline-block;
+    background-color: var(--color-secondary);
+    color: var(--color-text-dark);
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.title {
+    font-size: 2.2rem;
+    color: var(--color-text-dark);
+    font-family: var(--font-heading);
+    margin-bottom: 0.5rem;
+}
+
+.shortDesc {
+    font-size: 1.05rem;
+    color: #555;
+    max-width: 800px;
+}
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+}
+
+.infoCard {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.infoCard h4 {
+    font-size: 1rem;
+    color: var(--color-text-dark);
+    margin-bottom: 0.25rem;
+}
+
+.infoCard p {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.fullDescBox {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-top: 2rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.fullDescBox h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--color-text-dark);
+}
+
+.fullDescBox p {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+.notFound {
+    text-align: center;
+    padding: 5rem 1rem;
+}
+
+.backBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 50px;
+    font-weight: 600;
+}

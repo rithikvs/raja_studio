@@ -1,0 +1,347 @@
+.customizerContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    background-color: var(--color-white);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .customizerContainer {
+        grid-template-columns: 1fr;
+    }
+}
+
+.previewColumn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.framePreviewBox {
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 4 / 5;
+    background-color: #fdfbf7;
+    border: 14px solid #1a1a1a;
+    border-radius: 8px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.photoContainer {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.previewImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.overlayText {
+    position: absolute;
+    bottom: 1.5rem;
+    background: rgba(0, 0, 0, 0.65);
+    color: white;
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-family: var(--font-heading);
+    letter-spacing: 0.5px;
+    text-align: center;
+    backdrop-filter: blur(4px);
+    max-width: 85%;
+}
+
+.placeholderBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    color: #999;
+    padding: 2rem;
+    text-align: center;
+}
+
+.placeholderIcon {
+    opacity: 0.5;
+}
+
+.qualityBadge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    width: 100%;
+    max-width: 420px;
+    justify-content: center;
+}
+
+.excellent {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.good {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.low {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.optionsColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sectionHeading {
+    font-size: 1.3rem;
+    color: var(--color-text-dark);
+    border-bottom: 2px solid var(--color-secondary);
+    padding-bottom: 0.5rem;
+}
+
+.optionGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.groupLabel {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text-dark);
+}
+
+.selectedVal {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.required {
+    color: #dc2626;
+}
+
+.uploadArea {
+    position: relative;
+}
+
+.fileInput {
+    display: none;
+}
+
+.uploadBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.25rem;
+    background-color: var(--color-bg-light);
+    border: 2px dashed var(--color-primary);
+    color: var(--color-primary);
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.uploadBtn:hover {
+    background-color: var(--color-secondary);
+}
+
+.textInput {
+    padding: 0.8rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.textInput:focus {
+    border-color: var(--color-primary);
+}
+
+.swatchGrid {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.colorSwatch {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.colorSwatch:hover {
+    transform: scale(1.1);
+}
+
+.activeSwatch {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.3);
+}
+
+.chipGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.chipBtn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    border-radius: 50px;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.chipBtn:hover {
+    border-color: var(--color-primary);
+}
+
+.activeChip {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    font-weight: 600;
+}
+
+.extraPrice {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.addonList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.checkboxRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.checkboxRow input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-primary);
+}
+
+.priceContainer {
+    margin-top: 1rem;
+    padding-top: 1.25rem;
+    border-top: 1px dashed #ddd;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.priceHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.calculatedAmount {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    font-family: var(--font-heading);
+}
+
+.quantityRow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.qtyBox {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.qtyBox button {
+    padding: 0.3rem 0.8rem;
+    background: #eee;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.qtyBox span {
+    padding: 0.3rem 1rem;
+    font-weight: 600;
+}
+
+.ctaRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.addToCartBtn {
+    padding: 0.9rem;
+    background-color: var(--color-text-dark);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.addToCartBtn:hover {
+    background-color: #2b2520;
+}
+
+.buyNowBtn {
+    padding: 0.9rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.buyNowBtn:hover {
+    background-color: #a05a65;
+}

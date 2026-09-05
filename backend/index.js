@@ -14,7 +14,12 @@ const app = express(); const port = Number(process.env.PORT || 8787); const maxU
 const statuses = ['Pending', 'Confirmed', 'Photo Review', 'Printing', 'Ready', 'Shipped', 'Delivered', 'Cancelled'];
 const client = new MongoClient(process.env.MONGODB_URI || 'mongodb://invalid'); let database;
 const r2 = new S3Client({ region: process.env.CLOUDFLARE_R2_REGION || 'auto', endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`, credentials: { accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID || '', secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY || '' } });
-app.use(cors({ origin: process.env.CLIENT_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:5174'] })); 
+app.use(cors({ 
+  origin: process.env.CLIENT_ORIGIN?.split(',').map(origin => origin.trim()) || ['http://localhost:5173', 'http://localhost:5174'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+})); 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Accept all image formats - jpg, jpeg, png, gif, bmp, webp, svg, heic, heif, etc.
@@ -65,7 +70,23 @@ const mapOrder = async (order) => {
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, database: 'raja_studio' }));
 app.post('/api/auth/register', async (req, res) => { const { name, email, phone, password } = req.body; if (!name || !email || !phone || !password) return fail(res, 400, 'Name, email, phone, and password are required.'); if (password.length < 8) return fail(res, 400, 'Password must have at least 8 characters.'); const normalized = email.trim().toLowerCase(); if (await database.collection('users').findOne({ $or: [{ email: normalized }, { phone }] })) return fail(res, 409, 'An account with this email or phone already exists.'); const user = { full_name: name.trim(), email: normalized, phone, password_hash: await bcrypt.hash(password, 12), is_admin: false, created_at: new Date(), updated_at: new Date() }; const result = await database.collection('users').insertOne(user); user._id = result.insertedId; const token = jwt.sign({ id: user._id.toString(), is_admin: false }, process.env.JWT_SECRET, { expiresIn: '365d' }); res.status(201).json({ token, user: publicUser(user) }); });
-app.post('/api/auth/login', async (req, res) => { const email = req.body.email?.trim().toLowerCase(); const user = await database.collection('users').findOne({ $or: [{ email }, { phone: req.body.email }] }); if (!user || !(await bcrypt.compare(req.body.password || '', user.password_hash))) return fail(res, 401, 'Invalid email/phone or password.'); const token = jwt.sign({ id: user._id.toString(), is_admin: user.is_admin }, process.env.JWT_SECRET, { expiresIn: '365d' }); res.json({ token, user: publicUser(user) }); });
+app.post('/api/auth/login', async (req, res) => { 
+  try {
+    console.log('Login attempt from:', req.headers.origin);
+    const email = req.body.email?.trim().toLowerCase(); 
+    const user = await database.collection('users').findOne({ $or: [{ email }, { phone: req.body.email }] }); 
+    if (!user || !(await bcrypt.compare(req.body.password || '', user.password_hash))) {
+      console.log('Login failed: Invalid credentials for', email);
+      return fail(res, 401, 'Invalid email/phone or password.');
+    }
+    const token = jwt.sign({ id: user._id.toString(), is_admin: user.is_admin }, process.env.JWT_SECRET, { expiresIn: '365d' }); 
+    console.log('Login successful for:', user.email);
+    res.json({ token, user: publicUser(user) }); 
+  } catch (error) {
+    console.error('Login error:', error);
+    return fail(res, 500, 'An error occurred during login. Please try again.');
+  }
+});
 app.get('/api/products', async (_req, res) => { const products = await database.collection('products').find({ is_active: { $ne: false } }).sort({ created_at: -1 }).toArray(); res.json({ products: products.map((p) => ({ ...p, id: p._id.toString(), _id: undefined, image: p.image_url, createdAt: p.created_at })) }); });
 const productDto = (product) => ({ ...product, id: product._id.toString(), _id: undefined, image: product.image || product.image_url || '', image_url: product.image || product.image_url || '', price: Number(product.salePrice ?? product.price ?? 0), createdAt: product.created_at, updatedAt: product.updated_at });
 const productInput = (body) => ({ ...body, name: body.name?.trim(), price: Number(body.salePrice ?? body.price), regularPrice: Number(body.regularPrice ?? body.salePrice ?? body.price), salePrice: Number(body.salePrice ?? body.price), stock: Number(body.stock ?? 0), image_url: body.image || body.image_url || '', is_active: body.status !== 'disabled', status: body.status === 'disabled' ? 'disabled' : 'active', updated_at: new Date() });
@@ -346,4 +367,23 @@ app.use((error, _req, res, next) => {
     
     return fail(res, 500, error.message || 'Internal server error'); 
 });
-client.connect().then(async () => { database = client.db(process.env.MONGODB_DB_NAME || 'raja_studio'); await Promise.all(['users', 'addresses', 'products', 'orders', 'order_items', 'order_images', 'order_status_history'].map((name) => database.createCollection(name).catch(() => null))); await Promise.all([database.collection('users').createIndex({ email: 1 }, { unique: true }), database.collection('users').createIndex({ phone: 1 }, { unique: true }), database.collection('orders').createIndex({ user_id: 1, created_at: -1 }), database.collection('order_images').createIndex({ order_id: 1 })]); app.listen(port, () => console.log(`Raja Studio MongoDB API listening on ${port}`)); }).catch((error) => { console.error('MongoDB connection failed:', error.message); process.exit(1); });
+client.connect().then(async () => { 
+  database = client.db(process.env.MONGODB_DB_NAME || 'raja_studio'); 
+  await Promise.all(['users', 'addresses', 'products', 'orders', 'order_items', 'order_images', 'order_status_history'].map((name) => database.createCollection(name).catch(() => null))); 
+  await Promise.all([
+    database.collection('users').createIndex({ email: 1 }, { unique: true }), 
+    database.collection('users').createIndex({ phone: 1 }, { unique: true }), 
+    database.collection('orders').createIndex({ user_id: 1, created_at: -1 }), 
+    database.collection('order_images').createIndex({ order_id: 1 })
+  ]); 
+  
+  // Log CORS configuration
+  const allowedOrigins = process.env.CLIENT_ORIGIN?.split(',').map(origin => origin.trim()) || ['http://localhost:5173', 'http://localhost:5174'];
+  console.log('🌐 CORS enabled for origins:', allowedOrigins);
+  console.log('🚀 Raja Studio MongoDB API listening on port', port);
+  
+  app.listen(port);
+}).catch((error) => { 
+  console.error('❌ MongoDB connection failed:', error.message); 
+  process.exit(1); 
+});

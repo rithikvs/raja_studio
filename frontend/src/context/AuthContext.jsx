@@ -80,7 +80,10 @@ export const AuthProvider = ({ children }) => {
       window.dispatchEvent(new Event('raja_auth_change'));
       return { success: true, user };
     } catch (error) {
-      return { success: false, message: error.message };
+      console.error('❌ Authentication error:', error);
+      // Return a user-friendly error message
+      const errorMessage = error.message || 'Unable to connect to server. Please check your internet connection and try again.';
+      return { success: false, message: errorMessage };
     }
   };
 

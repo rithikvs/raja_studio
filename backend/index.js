@@ -14,8 +14,30 @@ const app = express(); const port = Number(process.env.PORT || 8787); const maxU
 const statuses = ['Pending', 'Confirmed', 'Photo Review', 'Printing', 'Ready', 'Shipped', 'Delivered', 'Cancelled'];
 const client = new MongoClient(process.env.MONGODB_URI || 'mongodb://invalid'); let database;
 const r2 = new S3Client({ region: process.env.CLOUDFLARE_R2_REGION || 'auto', endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`, credentials: { accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID || '', secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY || '' } });
-app.use(cors({ 
-  origin: process.env.CLIENT_ORIGIN?.split(',').map(origin => origin.trim()) || ['http://localhost:5173', 'http://localhost:5174'],
+// Safe dynamic CORS configuration
+const allowedOrigins = (process.env.CLIENT_ORIGIN || "")
+  .split(",")
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
+// Fallback for local development if CLIENT_ORIGIN not set
+if (allowedOrigins.length === 0) {
+  allowedOrigins.push('http://localhost:5173', 'http://localhost:5174');
+}
+
+app.use(cors({
+  origin(origin, callback) {
+    // Allow requests with no origin (like mobile apps, Postman, or same-origin)
+    if (!origin || allowedOrigins.includes(origin)) {
+      if (origin) {
+        console.log('✅ CORS allowed origin:', origin);
+      }
+      return callback(null, true);
+    }
+    console.error('❌ CORS rejected origin:', origin);
+    console.error('   Allowed origins:', allowedOrigins);
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -68,22 +90,51 @@ const mapOrder = async (order) => {
   };
 };
 
-app.get('/api/health', (_req, res) => res.json({ ok: true, database: 'raja_studio' }));
-app.post('/api/auth/register', async (req, res) => { const { name, email, phone, password } = req.body; if (!name || !email || !phone || !password) return fail(res, 400, 'Name, email, phone, and password are required.'); if (password.length < 8) return fail(res, 400, 'Password must have at least 8 characters.'); const normalized = email.trim().toLowerCase(); if (await database.collection('users').findOne({ $or: [{ email: normalized }, { phone }] })) return fail(res, 409, 'An account with this email or phone already exists.'); const user = { full_name: name.trim(), email: normalized, phone, password_hash: await bcrypt.hash(password, 12), is_admin: false, created_at: new Date(), updated_at: new Date() }; const result = await database.collection('users').insertOne(user); user._id = result.insertedId; const token = jwt.sign({ id: user._id.toString(), is_admin: false }, process.env.JWT_SECRET, { expiresIn: '365d' }); res.status(201).json({ token, user: publicUser(user) }); });
+app.get('/api/health', (_req, res) => {
+  console.log('🏥 Health check requested');
+  res.json({ ok: true, database: 'connected' });
+});
+app.post('/api/auth/register', async (req, res) => { 
+  const { name, email, phone, password } = req.body; 
+  console.log('📝 Registration attempt:', { email, phone });
+  
+  if (!name || !email || !phone || !password) return fail(res, 400, 'Name, email, phone, and password are required.'); 
+  if (password.length < 8) return fail(res, 400, 'Password must have at least 8 characters.'); 
+  
+  const normalized = email.trim().toLowerCase(); 
+  if (await database.collection('users').findOne({ $or: [{ email: normalized }, { phone }] })) {
+    console.log('❌ Registration failed: Email or phone already exists');
+    return fail(res, 409, 'An account with this email or phone already exists.');
+  }
+  
+  const user = { full_name: name.trim(), email: normalized, phone, password_hash: await bcrypt.hash(password, 12), is_admin: false, created_at: new Date(), updated_at: new Date() }; 
+  const result = await database.collection('users').insertOne(user); 
+  user._id = result.insertedId; 
+  const token = jwt.sign({ id: user._id.toString(), is_admin: false }, process.env.JWT_SECRET, { expiresIn: '365d' }); 
+  
+  console.log('✅ Registration successful:', user.email);
+  res.status(201).json({ token, user: publicUser(user) }); 
+});
 app.post('/api/auth/login', async (req, res) => { 
   try {
-    console.log('Login attempt from:', req.headers.origin);
+    const origin = req.headers.origin || 'no-origin';
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    console.log('🔐 Login attempt from:', origin);
+    console.log('   User-Agent:', userAgent.substring(0, 100));
+    
     const email = req.body.email?.trim().toLowerCase(); 
     const user = await database.collection('users').findOne({ $or: [{ email }, { phone: req.body.email }] }); 
+    
     if (!user || !(await bcrypt.compare(req.body.password || '', user.password_hash))) {
-      console.log('Login failed: Invalid credentials for', email);
+      console.log('❌ Login failed: Invalid credentials for', email || req.body.email);
       return fail(res, 401, 'Invalid email/phone or password.');
     }
+    
     const token = jwt.sign({ id: user._id.toString(), is_admin: user.is_admin }, process.env.JWT_SECRET, { expiresIn: '365d' }); 
-    console.log('Login successful for:', user.email);
+    console.log('✅ Login successful:', user.email, `(${user.is_admin ? 'admin' : 'user'})`);
     res.json({ token, user: publicUser(user) }); 
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('💥 Login error:', error);
     return fail(res, 500, 'An error occurred during login. Please try again.');
   }
 });
@@ -378,11 +429,13 @@ client.connect().then(async () => {
   ]); 
   
   // Log CORS configuration
-  const allowedOrigins = process.env.CLIENT_ORIGIN?.split(',').map(origin => origin.trim()) || ['http://localhost:5173', 'http://localhost:5174'];
   console.log('🌐 CORS enabled for origins:', allowedOrigins);
   console.log('🚀 Raja Studio MongoDB API listening on port', port);
   
-  app.listen(port);
+  // Bind to 0.0.0.0 to accept connections from any network interface (required for Render)
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`✅ Server successfully bound to 0.0.0.0:${port}`);
+  });
 }).catch((error) => { 
   console.error('❌ MongoDB connection failed:', error.message); 
   process.exit(1); 

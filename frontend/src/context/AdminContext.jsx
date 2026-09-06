@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { api } from '../services/api';
 
 const AdminContext = createContext();
 
@@ -21,30 +22,13 @@ export const AdminProvider = ({ children }) => {
         if (showLoading) setLoading(true);
         
         try {
-            const token = localStorage.getItem('raja_access_token');
-            if (!token) {
-                console.log('No admin token available');
-                setOrders([]);
-                return;
-            }
-
-            const response = await fetch('/api/admin/orders', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setOrders(data.orders || []);
-                setLastFetch(new Date());
-                console.log(`✅ Loaded ${data.orders?.length || 0} orders from MongoDB`);
-            } else {
-                console.log('Failed to fetch orders');
-            }
+            const data = await api('/admin/orders');
+            setOrders(data.orders || []);
+            setLastFetch(new Date());
+            console.log(`✅ Loaded ${data.orders?.length || 0} orders from MongoDB`);
         } catch (error) {
             console.error('Error fetching orders:', error);
+            setOrders([]);
         } finally {
             if (showLoading) setLoading(false);
         }
@@ -55,21 +39,9 @@ export const AdminProvider = ({ children }) => {
         if (showLoading) setRefreshingProducts(true);
         
         try {
-            const token = localStorage.getItem('raja_access_token');
-            if (!token) return;
-
-            const response = await fetch('/api/admin/products', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setProducts(data.products || []);
-                console.log(`✅ Loaded ${data.products?.length || 0} products`);
-            }
+            const data = await api('/admin/products');
+            setProducts(data.products || []);
+            console.log(`✅ Loaded ${data.products?.length || 0} products`);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
@@ -82,21 +54,9 @@ export const AdminProvider = ({ children }) => {
         if (showLoading) setRefreshingCustomers(true);
         
         try {
-            const token = localStorage.getItem('raja_access_token');
-            if (!token) return;
-
-            const response = await fetch('/api/admin/customers', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setCustomers(data.customers || []);
-                console.log(`✅ Loaded ${data.customers?.length || 0} customers`);
-            }
+            const data = await api('/admin/customers');
+            setCustomers(data.customers || []);
+            console.log(`✅ Loaded ${data.customers?.length || 0} customers`);
         } catch (error) {
             console.error('Error fetching customers:', error);
         } finally {
@@ -159,28 +119,21 @@ export const AdminProvider = ({ children }) => {
     // Update order status
     const updateOrderStatus = async (orderId, newStatus) => {
         try {
-            const token = localStorage.getItem('raja_access_token');
-            const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+            await api(`/admin/orders/${orderId}/status`, {
                 method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
             });
-
-            if (response.ok) {
-                // Update local state immediately
-                setOrders(prevOrders =>
-                    prevOrders.map(order =>
-                        order.id === orderId
-                            ? { ...order, status: newStatus }
-                            : order
-                    )
-                );
-                return true;
-            }
-            return false;
+            
+            // Update local state immediately
+            setOrders(prevOrders =>
+                prevOrders.map(order =>
+                    order.id === orderId
+                        ? { ...order, status: newStatus }
+                        : order
+                )
+            );
+            return true;
         } catch (error) {
             console.error('Error updating order status:', error);
             return false;
@@ -190,18 +143,11 @@ export const AdminProvider = ({ children }) => {
     // Delete order
     const deleteOrder = async (orderId) => {
         try {
-            const token = localStorage.getItem('raja_access_token');
-            const response = await fetch(`/api/admin/orders/${orderId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (response.ok) {
-                // Remove from local state immediately
-                setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
-                return true;
-            }
-            return false;
+            await api(`/admin/orders/${orderId}`, { method: 'DELETE' });
+            
+            // Remove from local state immediately
+            setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
+            return true;
         } catch (error) {
             console.error('Error deleting order:', error);
             return false;

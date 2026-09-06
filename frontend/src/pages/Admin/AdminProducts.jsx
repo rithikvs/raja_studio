@@ -30,6 +30,7 @@ const AdminProducts = () => {
         sku: '',
         category: '',
         subcategory: '',
+        pricingMode: 'simple', // 'simple' or 'variant'
         regularPrice: '',
         salePrice: '',
         gstPercent: 18,
@@ -73,6 +74,7 @@ const AdminProducts = () => {
             sku: '',
             category: categories[0]?.name || '',
             subcategory: '',
+            pricingMode: 'simple', // 'simple' or 'variant'
             regularPrice: '',
             salePrice: '',
             gstPercent: 18,
@@ -119,6 +121,7 @@ const AdminProducts = () => {
         setEditingProductId(product.id);
         setFormData({
             ...product,
+            pricingMode: product.pricingMode || 'simple', // Default to simple if not set
             customizationOptions: product.customizationOptions || [],
             galleryImages: product.galleryImages || []
         });
@@ -242,9 +245,27 @@ const AdminProducts = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.name || !formData.salePrice) {
-            alert('Please fill in Product Name and Sale Price.');
+        
+        // Validation based on pricing mode
+        if (!formData.name) {
+            alert('Please fill in Product Name.');
             return;
+        }
+        
+        if (formData.pricingMode === 'simple' && !formData.salePrice) {
+            alert('Please fill in Sale Price for simple pricing mode.');
+            return;
+        }
+        
+        if (formData.pricingMode === 'variant') {
+            // Validate that at least one option has a price
+            const hasVariantWithPrice = formData.customizationOptions.some(group => 
+                group.options.some(opt => opt.priceAdjustment > 0)
+            );
+            if (!hasVariantWithPrice) {
+                alert('Variant pricing mode requires at least one option with a price. Please set variant prices in the customization options below.');
+                return;
+            }
         }
 
         // Show immediate feedback
@@ -255,8 +276,9 @@ const AdminProducts = () => {
 
         const payload = {
             ...formData,
-            regularPrice: Number(formData.regularPrice || formData.salePrice),
-            salePrice: Number(formData.salePrice),
+            pricingMode: formData.pricingMode || 'simple',
+            regularPrice: Number(formData.regularPrice || formData.salePrice || 0),
+            salePrice: Number(formData.salePrice || 0),
             stock: Number(formData.stock || 50),
             sku: formData.sku || 'SKU-' + Math.floor(1000 + Math.random() * 9000)
         };
@@ -442,22 +464,63 @@ const AdminProducts = () => {
                                     />
                                 </div>
 
+                                <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
+                                    <label>Pricing Mode *</label>
+                                    <select
+                                        value={formData.pricingMode}
+                                        onChange={(e) => setFormData({ ...formData, pricingMode: e.target.value })}
+                                        required
+                                        style={{ 
+                                            backgroundColor: formData.pricingMode === 'variant' ? '#fff3cd' : '#fff',
+                                            fontWeight: formData.pricingMode === 'variant' ? '600' : 'normal'
+                                        }}
+                                    >
+                                        <option value="simple">Simple Pricing (Base price + option adjustments)</option>
+                                        <option value="variant">Variant Pricing (Each option has fixed price - for frames)</option>
+                                    </select>
+                                    {formData.pricingMode === 'variant' && (
+                                        <small style={{ display: 'block', marginTop: '6px', color: '#856404', fontSize: '0.85rem' }}>
+                                            ⚠️ VARIANT MODE: Option prices below will be used as FINAL prices, not additions. 
+                                            Base price will be ignored. Use this for photo frames where each size/design has its own fixed price.
+                                        </small>
+                                    )}
+                                    {formData.pricingMode === 'simple' && (
+                                        <small style={{ display: 'block', marginTop: '6px', color: '#666', fontSize: '0.85rem' }}>
+                                            ℹ️ SIMPLE MODE: Base price + option price adjustments. Use for products like mugs, t-shirts.
+                                        </small>
+                                    )}
+                                </div>
+
                                 <div className={styles.inputGroup}>
-                                    <label>Regular Price (MRP ₹)</label>
+                                    <label>
+                                        {formData.pricingMode === 'variant' ? 'Base Price (Optional - not used for variants)' : 'Regular Price (MRP ₹)'}
+                                    </label>
                                     <input
                                         type="number"
                                         value={formData.regularPrice}
                                         onChange={(e) => setFormData({ ...formData, regularPrice: e.target.value })}
+                                        disabled={formData.pricingMode === 'variant'}
+                                        style={{ 
+                                            opacity: formData.pricingMode === 'variant' ? 0.5 : 1,
+                                            cursor: formData.pricingMode === 'variant' ? 'not-allowed' : 'text'
+                                        }}
                                     />
                                 </div>
 
                                 <div className={styles.inputGroup}>
-                                    <label>Customer Sale Price (₹) *</label>
+                                    <label>
+                                        {formData.pricingMode === 'variant' ? 'Base Sale Price (Optional - not used for variants)' : 'Customer Sale Price (₹) *'}
+                                    </label>
                                     <input
                                         type="number"
                                         value={formData.salePrice}
                                         onChange={(e) => setFormData({ ...formData, salePrice: e.target.value })}
-                                        required
+                                        required={formData.pricingMode === 'simple'}
+                                        disabled={formData.pricingMode === 'variant'}
+                                        style={{ 
+                                            opacity: formData.pricingMode === 'variant' ? 0.5 : 1,
+                                            cursor: formData.pricingMode === 'variant' ? 'not-allowed' : 'text'
+                                        }}
                                     />
                                 </div>
 
@@ -606,7 +669,7 @@ const AdminProducts = () => {
                                                     )}
                                                     <input
                                                         type="number"
-                                                        placeholder="Final Price (₹)"
+                                                        placeholder={formData.pricingMode === 'variant' ? 'Fixed Price (₹)' : 'Price Adjustment (₹)'}
                                                         value={val.priceAdjustment}
                                                         onChange={(e) => {
                                                             const updated = [...formData.customizationOptions];
@@ -614,7 +677,12 @@ const AdminProducts = () => {
                                                             setFormData({ ...formData, customizationOptions: updated });
                                                         }}
                                                         className={styles.adjInput}
-                                                        title="Enter the complete price for this option (not an adjustment)"
+                                                        title={formData.pricingMode === 'variant' 
+                                                            ? 'Enter the complete fixed price for this variant (e.g., Frame ₹100)' 
+                                                            : 'Enter price adjustment to add to base price (e.g., +₹50)'}
+                                                        style={{
+                                                            backgroundColor: formData.pricingMode === 'variant' ? '#fff3cd' : '#fff'
+                                                        }}
                                                     />
                                                     <button type="button" onClick={() => handleRemoveOptionVal(groupIdx, valIdx)} className={styles.removeValBtn}>
                                                         ×

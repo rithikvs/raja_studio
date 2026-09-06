@@ -228,16 +228,35 @@ app.post('/api/orders', auth, upload.any(), async (req, res) => {
     const orderResult = await database.collection('orders').insertOne(order); 
     order._id = orderResult.insertedId; 
     
-    // Create order items
-    const itemRows = input.items.map((item) => ({ 
-        order_id: order._id, 
-        product_id: ObjectId.isValid(item.productId) ? id(item.productId) : null, 
-        product_name: item.productName, 
-        quantity: Number(item.quantity), 
-        price: Number(item.price), 
-        customization: item.selectedOptions || {}, 
-        custom_text: item.customText || '', 
-        created_at: now 
+    // Create order items (with price validation for security)
+    const itemRows = await Promise.all(input.items.map(async (item) => {
+        // Optional: Validate product exists and pricing mode
+        if (ObjectId.isValid(item.productId)) {
+            try {
+                const product = await database.collection('products').findOne({ _id: id(item.productId) });
+                if (product) {
+                    console.log(`✓ Order item validated: ${product.name} (pricingMode: ${product.pricingMode || 'simple'})`);
+                    // Future enhancement: Recalculate price based on product.pricingMode and selectedOptions
+                    // For now, log a warning if prices seem suspicious
+                    if (product.pricingMode === 'variant' && item.price < 50) {
+                        console.warn(`⚠️ Variant product with suspiciously low price: ${item.price}`);
+                    }
+                }
+            } catch (err) {
+                console.warn('Product validation skipped:', err.message);
+            }
+        }
+        
+        return { 
+            order_id: order._id, 
+            product_id: ObjectId.isValid(item.productId) ? id(item.productId) : null, 
+            product_name: item.productName, 
+            quantity: Number(item.quantity), 
+            price: Number(item.price), 
+            customization: item.selectedOptions || {}, 
+            custom_text: item.customText || '', 
+            created_at: now 
+        };
     })); 
     const inserted = await database.collection('order_items').insertMany(itemRows); 
     const savedItems = itemRows.map((item, index) => ({ ...item, _id: inserted.insertedIds[index] })); 

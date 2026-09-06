@@ -75,18 +75,49 @@ const PhotoCustomizer = ({ product }) => {
 
     // Live Price Recalculation
     useEffect(() => {
-        let base = Number(product.salePrice || product.price || 399);
-
-        customizationConfig.forEach(optGroup => {
-            const selectedVal = selectedOptions[optGroup.name];
-            if (selectedVal && optGroup.options) {
-                const match = optGroup.options.find(o => o.label === selectedVal);
-                if (match && match.priceAdjustment) {
-                    base += Number(match.priceAdjustment);
+        let base = 0;
+        
+        // Check if product uses variant pricing mode
+        const pricingMode = product.pricingMode || 'simple';
+        
+        if (pricingMode === 'variant') {
+            // VARIANT PRICING: Use selected variant price, NOT product base price
+            // Example: Frame 1 = ₹100 (final price ₹100, not ₹80 + ₹100)
+            let variantPrice = 0;
+            let foundVariant = false;
+            
+            customizationConfig.forEach(optGroup => {
+                const selectedVal = selectedOptions[optGroup.name];
+                if (selectedVal && optGroup.options) {
+                    const match = optGroup.options.find(o => o.label === selectedVal);
+                    if (match && match.price !== undefined) {
+                        // This option has a full price (variant pricing)
+                        variantPrice = Number(match.price);
+                        foundVariant = true;
+                    } else if (match && match.priceAdjustment && foundVariant) {
+                        // Add adjustments from other options
+                        variantPrice += Number(match.priceAdjustment);
+                    }
                 }
-            }
-        });
+            });
+            
+            base = variantPrice > 0 ? variantPrice : Number(product.salePrice || product.price || 0);
+        } else {
+            // SIMPLE PRICING: Start with product base price and add adjustments
+            base = Number(product.salePrice || product.price || 399);
+            
+            customizationConfig.forEach(optGroup => {
+                const selectedVal = selectedOptions[optGroup.name];
+                if (selectedVal && optGroup.options) {
+                    const match = optGroup.options.find(o => o.label === selectedVal);
+                    if (match && match.priceAdjustment) {
+                        base += Number(match.priceAdjustment);
+                    }
+                }
+            });
+        }
 
+        // Add-ons are ALWAYS additive (for both simple and variant pricing)
         if (giftPacking) base += 50;
         if (glitter) base += 80;
 
@@ -138,6 +169,7 @@ const PhotoCustomizer = ({ product }) => {
             productImage: product.image || (product.images && product.images[0]) || '',
             price: calculatedPrice,
             basePrice: product.price,
+            pricingMode: product.pricingMode || 'simple',
             selectedOptions,
             customPhoto,
             customPhotoFile,
@@ -282,7 +314,13 @@ const PhotoCustomizer = ({ product }) => {
                 <div className={styles.priceContainer}>
                     <div className={styles.priceHeader}>
                         <span>Calculated Total Price:</span>
-                        <div className={styles.calculatedAmount}>₹{calculatedPrice * quantity}</div>
+                        <div className={styles.calculatedAmount}>
+                            {product.pricingMode === 'variant' && calculatedPrice === 0 ? (
+                                <span style={{ fontSize: '0.9rem', color: '#666' }}>Select options to view price</span>
+                            ) : (
+                                `₹${calculatedPrice * quantity}`
+                            )}
+                        </div>
                     </div>
 
                     <div className={styles.quantityRow}>

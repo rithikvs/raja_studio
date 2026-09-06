@@ -84,6 +84,22 @@ export const initDB = () => {
     if (!localStorage.getItem(KEYS.CUSTOMERS)) {
         setStorageItem(KEYS.CUSTOMERS, []);
     }
+    // Initialize default coupons if none exist
+    if (!localStorage.getItem(KEYS.COUPONS)) {
+        const defaultCoupons = [
+            {
+                id: 'coup_default_1',
+                code: 'LED10',
+                discountType: 'percentage',
+                discountValue: 10,
+                minCartValue: 500,
+                status: 'active',
+                createdAt: new Date().toISOString(),
+                description: '10% off on orders above ₹500'
+            }
+        ];
+        setStorageItem(KEYS.COUPONS, defaultCoupons);
+    }
     if (!localStorage.getItem(KEYS.COUPONS)) {
         setStorageItem(KEYS.COUPONS, []);
     }

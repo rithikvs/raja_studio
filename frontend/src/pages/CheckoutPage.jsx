@@ -175,7 +175,6 @@ const CheckoutPage = () => {
     const finalGrandTotal = finalSubtotal + shipping + finalGst;
 
     const createOrderData = (payment = paymentMethod) => ({
-        customerId: customerUser?.id,
         customerName: formData.customerName,
         phone: formData.phone,
         email: formData.email,
@@ -184,32 +183,19 @@ const CheckoutPage = () => {
             city: formData.city,
             state: formData.state,
             pincode: formData.pincode,
-            landmark: formData.landmark
+            landmark: formData.landmark,
+            country: 'India'
         },
-        orderNotes: formData.orderNotes,
         items: cart.map(item => ({
             productId: item.productId,
             productName: item.productName,
-            productImage: item.productImage,
-            customPhoto: item.customPhoto,
-            hasPhoto: Boolean(item.customPhotoFile),
-            photoQuality: item.photoQuality,
-            selectedOptions: item.selectedOptions,
-            customText: item.customText,
-            giftPacking: item.giftPacking,
-            glitter: item.glitter,
             price: item.price,
-            quantity: item.quantity
+            quantity: item.quantity,
+            selectedOptions: item.selectedOptions || {},
+            customText: item.customText || ''
         })),
-        subtotal,
-        couponCode: appliedCoupon?.code || null,
-        couponDiscount: couponDiscount,
-        discountAmount: discountAmount + couponDiscount,
-        shipping,
-        gst: finalGst,
         totalAmount: finalGrandTotal,
-        paymentMethod: payment,
-        status: 'Order Received'
+        paymentMethod: payment
     });
 
     const handlePlaceOrder = async (e) => {
@@ -242,7 +228,9 @@ const CheckoutPage = () => {
                 }
             });
 
-            const response = await fetch('/api/orders', {
+            // Use centralized API with correct base URL
+            const baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+            const response = await fetch(`${baseUrl}/api/orders`, {
                 method: 'POST',
                 headers: token ? {
                     'Authorization': `Bearer ${token}`

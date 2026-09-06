@@ -74,12 +74,14 @@ const AdminOrders = () => {
             } else if (image?.id) {
                 // MongoDB image - get URL and download
                 const token = localStorage.getItem('raja_access_token');
-                const response = await fetch(`/api/admin/images/${image.id}/url`, {
+                const apiUrl = import.meta.env.VITE_API_URL || '';
+                const response = await fetch(`${apiUrl}/api/admin/images/${image.id}/url`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Got image URL data:', { hasUrl: !!data.url, format: data.format, expiresIn: data.expiresIn });
                     
                     // Check if it's a base64 data URL or a regular URL
                     if (data.format === 'base64' || data.url.startsWith('data:')) {
@@ -90,26 +92,27 @@ const AdminOrders = () => {
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
+                        console.log('✅ Downloaded base64 image');
                     } else {
-                        // Regular URL - fetch and download
-                        const imageResponse = await fetch(data.url);
-                        const blob = await imageResponse.blob();
-                        const blobUrl = window.URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = blobUrl;
-                        link.download = filename || image.original_file_name || 'download.jpg';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(blobUrl);
+                        // R2 signed URL - open in new window (browser will handle download)
+                        // The ResponseContentDisposition header in the signed URL tells browser to download
+                        window.open(data.url, '_blank');
+                        console.log('✅ Opened signed URL for download');
                     }
                 } else {
-                    throw new Error('Failed to get image URL');
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('API error response:', errorData);
+                    throw new Error(errorData.message || `Server error: ${response.status}`);
                 }
             }
         } catch (error) {
             console.error('Error downloading photo:', error);
-            alert('Failed to download photo. Please try again.');
+            console.error('Error details:', {
+                imageid: image?.id,
+                filename: filename,
+                errorMessage: error.message
+            });
+            alert(`Failed to download photo: ${error.message}\n\nPlease check browser console for details.`);
         }
     };
 

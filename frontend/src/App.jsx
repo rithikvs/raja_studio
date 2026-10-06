@@ -9,10 +9,11 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { AdminProvider } from './context/AdminContext';
 
-// Components
 import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
+import MobileBottomNav from './components/Layout/MobileBottomNav';
 import WhatsAppFloat from './components/UI/WhatsAppFloat';
+import FloatingBasket from './components/UI/FloatingBasket';
 import BackToTop from './components/UI/BackToTop';
 import LoginModal from './components/UI/LoginModal';
 
@@ -63,11 +64,13 @@ const CustomerLayout = () => {
         <div className="app-container">
             <Navbar />
             <WhatsAppFloat />
+            <FloatingBasket />
             <BackToTop />
-            <main style={{ minHeight: '80vh', padding: '0' }}>
+            <main style={{ minHeight: '80vh', padding: '0 0 60px 0' }}>
                 <Outlet />
             </main>
             <Footer />
+            <MobileBottomNav />
         </div>
     );
 };

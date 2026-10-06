@@ -570,7 +570,7 @@ ${formData.orderNotes ? `Notes: ${formData.orderNotes}` : ''}`;
                                         className={styles.applyBtn}
                                         style={{
                                             padding: '0.6rem 1rem',
-                                            backgroundColor: '#B76E79',
+                                            backgroundColor: '#ff6600',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '4px',

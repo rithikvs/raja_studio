@@ -23,7 +23,7 @@ const CartPage = () => {
     if (cart.length === 0) {
         return (
             <div className={`container section-padding ${styles.emptyCartContainer}`}>
-                <ShoppingBag size={64} color="#B76E79" />
+                <ShoppingBag size={64} color="#ff6600" />
                 <h2>Your Shopping Cart is Empty</h2>
                 <p>Looks like you haven't added any customized photo gifts to your cart yet.</p>
                 <Link to="/shop" className={styles.continueBtn}>

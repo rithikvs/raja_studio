@@ -3,7 +3,7 @@
 }
 
 .pageHeader {
-    background: linear-gradient(135deg, #B76E79, #a05a65);
+    background: linear-gradient(135deg, #ff6600, #e55b00);
     color: white;
     padding: 3.5rem 0;
     text-align: center;
@@ -47,7 +47,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #B76E79, #a05a65);
+    background: linear-gradient(135deg, #ff6600, #e55b00);
     color: white;
     border-radius: 16px;
     margin-bottom: 1.5rem;
@@ -108,12 +108,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #B76E79, #a05a65);
+    background: linear-gradient(135deg, #ff6600, #e55b00);
     color: white;
     font-size: 1.5rem;
     font-weight: 700;
     border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(183, 110, 121, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
 }
 
 .processStep h3 {
@@ -155,7 +155,7 @@
 
 /* CTA Section */
 .ctaSection {
-    background: linear-gradient(135deg, #B76E79, #a05a65);
+    background: linear-gradient(135deg, #ff6600, #e55b00);
     color: white;
     padding: 4rem 0;
     text-align: center;
@@ -192,7 +192,7 @@
 
 .primaryBtn {
     background: white;
-    color: #B76E79;
+    color: #ff6600;
 }
 
 .secondaryBtn {

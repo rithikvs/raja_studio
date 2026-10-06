@@ -22,8 +22,7 @@
 }
 
 .primary:hover {
-    background-color: #A05A65;
-    /* Darker Rose Gold */
+    background-color: #e55b00;
     box-shadow: var(--shadow-md);
 }
 

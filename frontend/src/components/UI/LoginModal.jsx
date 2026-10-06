@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Lock, Mail, User, Phone, LogIn, UserPlus } from 'lucide-react';
+import { X, Lock, Mail, User, Phone, LogIn, UserPlus, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,8 @@ const LoginModal = () => {
     const navigate = useNavigate();
 
     const [isRegister, setIsRegister] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(true);
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -53,7 +55,10 @@ const LoginModal = () => {
                 setError('Please fill in all required fields.');
                 return;
             }
-            const res = await registerCustomer(formData);
+            const res = await registerCustomer({
+                ...formData,
+                confirmPassword: formData.confirmPassword || formData.password
+            });
             if (res.success) {
                 setSuccessMsg('Account created successfully!');
                 setTimeout(() => handleSuccessAuth(), 500);
@@ -62,13 +67,18 @@ const LoginModal = () => {
             }
         } else {
             if (!formData.email || !formData.password) {
-                setError('Please enter your email/phone and password.');
+                setError('Please enter your username/email and password.');
                 return;
             }
             const res = await loginCustomer(formData.email, formData.password);
             if (res.success) {
                 setSuccessMsg('Login successful!');
-                setTimeout(() => handleSuccessAuth(), 500);
+                setTimeout(() => {
+                    handleSuccessAuth();
+                    if (!pendingAction || pendingAction.type !== 'BUY_NOW') {
+                        navigate('/account');
+                    }
+                }, 500);
             } else {
                 setError(res.message);
             }
@@ -89,94 +99,101 @@ const LoginModal = () => {
                         <X size={20} />
                     </button>
 
-                    <div className={styles.header}>
-                        <h2>{isRegister ? 'Create Account' : 'Welcome Back'}</h2>
-                        <p className={styles.subtitle}>
-                            {pendingAction
-                                ? '🔒 Login to continue your personalized gift order.'
-                                : 'Login to manage your orders, saved photos, and wishlist.'}
-                        </p>
-                    </div>
+                    <h2 className={styles.title}>{isRegister ? 'Register' : 'Login'}</h2>
 
-                    {error && <div className={styles.errorAlert}>{error}</div>}
-                    {successMsg && <div className={styles.successAlert}>{successMsg}</div>}
+                    <div className={styles.dashedBox}>
+                        {error && <div className={styles.errorAlert}>{error}</div>}
+                        {successMsg && <div className={styles.successAlert}>{successMsg}</div>}
 
-                    <form onSubmit={handleSubmit} className={styles.form}>
-                        {isRegister && (
-                            <div className={styles.inputGroup}>
-                                <User className={styles.inputIcon} size={18} />
+                        <form onSubmit={handleSubmit} className={styles.form}>
+                            {isRegister && (
+                                <div className={styles.fieldGroup}>
+                                    <label>Full Name <span className={styles.req}>*</span></label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                            )}
+
+                            <div className={styles.fieldGroup}>
+                                <label>Username or email address <span className={styles.req}>*</span></label>
                                 <input
                                     type="text"
-                                    name="name"
-                                    placeholder="Full Name"
-                                    value={formData.name}
+                                    name="email"
+                                    value={formData.email}
                                     onChange={handleInputChange}
                                     required
                                 />
                             </div>
-                        )}
 
-                        <div className={styles.inputGroup}>
-                            <Mail className={styles.inputIcon} size={18} />
-                            <input
-                                type="text"
-                                name="email"
-                                placeholder={isRegister ? "Email Address" : "Email Address or Mobile Number"}
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
+                            {isRegister && (
+                                <div className={styles.fieldGroup}>
+                                    <label>Mobile Number</label>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
+                            )}
 
-                        {isRegister && (
-                            <div className={styles.inputGroup}>
-                                <Phone className={styles.inputIcon} size={18} />
-                                <input
-                                    type="tel"
-                                    name="phone"
-                                    placeholder="Mobile Number"
-                                    value={formData.phone}
-                                    onChange={handleInputChange}
-                                />
+                            <div className={styles.fieldGroup}>
+                                <label>Password <span className={styles.req}>*</span></label>
+                                <div className={styles.passwordWrapper}>
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className={styles.eyeToggle}
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
                             </div>
-                        )}
 
-                        <div className={styles.inputGroup}>
-                            <Lock className={styles.inputIcon} size={18} />
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                value={formData.password}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
+                            {!isRegister && (
+                                <div className={styles.checkboxRow}>
+                                    <label className={styles.rememberCheck}>
+                                        <input
+                                            type="checkbox"
+                                            checked={rememberMe}
+                                            onChange={(e) => setRememberMe(e.target.checked)}
+                                        />
+                                        <span>Remember me</span>
+                                    </label>
+                                </div>
+                            )}
 
-                        {isRegister && (
-                            <div className={styles.inputGroup}>
-                                <Lock className={styles.inputIcon} size={18} />
-                                <input
-                                    type="password"
-                                    name="confirmPassword"
-                                    placeholder="Confirm Password"
-                                    value={formData.confirmPassword}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-                        )}
+                            <button type="submit" className={styles.orangeSubmitBtn}>
+                                {isRegister ? 'Register' : 'Log in'}
+                            </button>
 
-                        <button type="submit" className={styles.submitBtn}>
-                            {isRegister ? <><UserPlus size={18} /> Create Account</> : <><LogIn size={18} /> Login to Continue</>}
-                        </button>
-                    </form>
+                            {!isRegister && (
+                                <div className={styles.lostPasswordLink}>
+                                    <a href="#forgot" onClick={(e) => { e.preventDefault(); alert('Password reset link sent to your registered email.'); }}>
+                                        Lost your password?
+                                    </a>
+                                </div>
+                            )}
+                        </form>
+                    </div>
 
                     <div className={styles.footerToggle}>
                         {isRegister ? (
-                            <p>Already have an account? <span onClick={() => { setIsRegister(false); setError(''); }}>Sign In</span></p>
+                            <p>Already have an account? <span onClick={() => { setIsRegister(false); setError(''); }}>Log in</span></p>
                         ) : (
-                            <p>Don't have an account? <span onClick={() => { setIsRegister(true); setError(''); }}>Create One</span></p>
+                            <p>Don't have an account? <span onClick={() => { setIsRegister(true); setError(''); }}>Register</span></p>
                         )}
                     </div>
                 </motion.div>

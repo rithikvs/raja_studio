@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Image as ImageIcon, Heart, ShoppingBag, Star } from 'lucide-react';
 import { useData } from '../context/DataContext';
+import { getProductDisplayPrice } from '../utils/productUtils';
 import styles from './Works.module.css';
 
 const Works = () => {
@@ -111,7 +112,7 @@ const Works = () => {
                                         <div className={styles.overlay}>
                                             <h3>{product.name}</h3>
                                             <p className={styles.category}>{product.category}</p>
-                                            <div className={styles.price}>₹{product.salePrice || product.price}</div>
+                                            <div className={styles.price}>₹{getProductDisplayPrice(product)}</div>
                                         </div>
                                     </div>
                                 </Link>

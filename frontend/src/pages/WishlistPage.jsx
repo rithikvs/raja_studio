@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Trash2, Sparkles, ArrowLeft } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { getProductDisplayPrice } from '../utils/productUtils';
 import styles from './WishlistPage.module.css';
 
 const WishlistPage = () => {
@@ -10,7 +11,7 @@ const WishlistPage = () => {
     if (wishlist.length === 0) {
         return (
             <div className={`container section-padding ${styles.emptyWishlist}`}>
-                <Heart size={64} color="#B76E79" />
+                <Heart size={64} color="#ff6600" />
                 <h2>Your Wishlist is Empty</h2>
                 <p>Explore our personalized gifts and click the heart icon to save your favorite items.</p>
                 <Link to="/shop" className={styles.shopBtn}>
@@ -41,7 +42,7 @@ const WishlistPage = () => {
                             <div className={styles.cardBody}>
                                 <span className={styles.catTag}>{product.category || 'Personalized Gift'}</span>
                                 <h3>{product.name}</h3>
-                                <p className={styles.price}>₹{product.salePrice || product.price}</p>
+                                <p className={styles.price}>₹{getProductDisplayPrice(product)}</p>
                                 <Link to={`/product/${product.id}`} className={styles.customizeBtn}>
                                     <Sparkles size={16} /> Customize & Order
                                 </Link>

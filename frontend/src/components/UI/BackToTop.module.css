@@ -1,23 +1,32 @@
 .backToTopBtn {
     position: fixed;
     bottom: 30px;
-    left: 30px;
-    /* Left side to avoid WhatsApp button */
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: var(--color-primary);
-    color: #fff;
+    right: 30px;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background-color: #000000;
+    color: #ffffff;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--shadow-md);
-    z-index: 999;
-    transition: background-color 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 998;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .backToTopBtn:hover {
-    background-color: var(--color-text-dark);
+    background-color: #222222;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .backToTopBtn {
+        bottom: calc(125px + env(safe-area-inset-bottom, 0px));
+        right: 12px;
+        width: 42px;
+        height: 42px;
+    }
 }

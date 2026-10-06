@@ -9,15 +9,17 @@ const WhatsAppFloat = () => {
             href="https://wa.me/919629741825"
             target="_blank"
             rel="noopener noreferrer"
-            className={styles.floatBtn}
+            className={styles.floatBtnWrapper}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 1, type: 'spring', stiffness: 260, damping: 20 }}
-            whileHover={{ scale: 1.1, rotate: 10 }}
-            whileTap={{ scale: 0.9 }}
+            transition={{ delay: 0.5, type: 'spring', stiffness: 260, damping: 20 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
         >
-            <MessageCircle size={32} />
-            <span className={styles.tooltip}>Chat with us</span>
+            <div className={styles.iconCircle}>
+                <MessageCircle size={24} fill="#ffffff" color="#25D366" />
+            </div>
+            <span className={styles.pillText}>Contact us</span>
         </motion.a>
     );
 };

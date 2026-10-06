@@ -44,91 +44,98 @@ const Navbar = () => {
     ];
 
     return (
-        <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
-            <div className={`container ${styles.navContainer}`}>
-                {/* Brand Logo */}
-                <Link to="/" className={styles.logo}>
-                    <span className={styles.brandPrimary}>{cms.businessName || 'RAJA STUDIO'}</span>
-                    <span className={styles.brandSub}>{cms.giftDivision || 'RAJA GIFTS'}</span>
-                </Link>
+        <header className={styles.navbarWrapper}>
+            {/* Top Announcement Banner */}
+            <div className={styles.topAnnouncementBar}>
+                {cms.announcementBanner || 'Free Shipping For Every Order'}
+            </div>
 
-                {/* Desktop Nav Links */}
-                <ul className={styles.desktopMenu}>
-                    {navLinks.map((link) => (
-                        <li key={link.name}>
-                            <NavLink
-                                to={link.path}
-                                className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}
-                            >
-                                {link.name}
-                            </NavLink>
-                        </li>
-                    ))}
-                </ul>
-
-                {/* Header Action Icons */}
-                <div className={styles.headerActions}>
-                    <Link to="/shop" className={styles.iconBtn} title="Search Products">
-                        <Search size={20} />
-                    </Link>
-
-                    <Link to="/wishlist" className={styles.iconBtn} title="Wishlist">
-                        <Heart size={20} />
-                        {wishlist.length > 0 && <span className={styles.badge}>{wishlist.length}</span>}
-                    </Link>
-
-                    <Link to="/cart" className={styles.iconBtn} title="Shopping Cart">
-                        <ShoppingBag size={20} />
-                        {totalCartCount > 0 && <span className={styles.badge}>{totalCartCount}</span>}
-                    </Link>
-
-                    {/* Customer Account Header Dropdown - ONLY CUSTOMERS */}
-                    <div className={styles.userMenuWrapper}>
-                        {customerUser ? (
-                            <button className={styles.userBtn} onClick={() => setUserMenuOpen(!userMenuOpen)}>
-                                <User size={20} />
-                                <span className={styles.userName}>{customerUser.name || 'My Account'}</span>
-                            </button>
-                        ) : (
-                            <button className={styles.loginBtn} onClick={() => setLoginModalOpen(true)}>
-                                Login
-                            </button>
-                        )}
-
-                        <AnimatePresence>
-                            {userMenuOpen && customerUser && (
-                                <motion.div
-                                    className={styles.userDropdown}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                >
-                                    <div className={styles.userDropdownHeader}>
-                                        <p className={styles.userRoleTag}>CUSTOMER</p>
-                                        <p className={styles.userEmail}>{customerUser.email}</p>
-                                    </div>
-                                    <hr />
-                                    <Link to="/account" onClick={() => setUserMenuOpen(false)} className={styles.dropdownItem}>
-                                        <User size={16} /> My Account Dashboard
-                                    </Link>
-                                    <Link to="/account/orders" onClick={() => setUserMenuOpen(false)} className={styles.dropdownItem}>
-                                        <Package size={16} /> My Orders
-                                    </Link>
-                                    <button onClick={() => { logoutCustomer(); setUserMenuOpen(false); navigate('/'); }} className={styles.dropdownItemLogout}>
-                                        <LogOut size={16} /> Logout
-                                    </button>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* Mobile Menu Toggle */}
-                    <button className={styles.menuToggle} onClick={() => setIsOpen(!isOpen)}>
-                        {isOpen ? <X size={26} /> : <Menu size={26} />}
+            <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
+                <div className={`container ${styles.navContainer}`}>
+                    {/* Mobile Menu Toggle (Left on Mobile) */}
+                    <button className={styles.menuToggle} onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
+                        {isOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
+
+                    {/* Brand Logo (Center on Mobile, Left on Desktop) */}
+                    <Link to="/" className={styles.logo}>
+                        <span className={styles.brandPrimary}>{cms.businessName || 'ECE MAKERS'}</span>
+                        <span className={styles.brandSub}>{cms.giftDivision || 'CUSTOM GIFTS'}</span>
+                    </Link>
+
+                    {/* Desktop Nav Links */}
+                    <ul className={styles.desktopMenu}>
+                        {navLinks.map((link) => (
+                            <li key={link.name}>
+                                <NavLink
+                                    to={link.path}
+                                    className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}
+                                >
+                                    {link.name}
+                                </NavLink>
+                            </li>
+                        ))}
+                    </ul>
+
+                    {/* Header Action Icons (Right on Mobile & Desktop) */}
+                    <div className={styles.headerActions}>
+                        <Link to="/shop" className={`${styles.iconBtn} ${styles.desktopOnly}`} title="Search Products">
+                            <Search size={20} />
+                        </Link>
+
+                        <Link to="/wishlist" className={`${styles.iconBtn} ${styles.desktopOnly}`} title="Wishlist">
+                            <Heart size={20} />
+                            {wishlist.length > 0 && <span className={styles.badge}>{wishlist.length}</span>}
+                        </Link>
+
+                        <Link to="/cart" className={styles.iconBtn} title="Shopping Cart">
+                            <ShoppingBag size={22} />
+                            <span className={styles.badge}>{totalCartCount}</span>
+                        </Link>
+
+                        {/* Customer Account Header Dropdown */}
+                        <div className={`${styles.userMenuWrapper} ${styles.desktopOnly}`}>
+                            {customerUser ? (
+                                <button className={styles.userBtn} onClick={() => setUserMenuOpen(!userMenuOpen)}>
+                                    <User size={20} />
+                                    <span className={styles.userName}>{customerUser.name || 'My Account'}</span>
+                                </button>
+                            ) : (
+                                <button className={styles.loginBtn} onClick={() => setLoginModalOpen(true)}>
+                                    Login
+                                </button>
+                            )}
+
+                            <AnimatePresence>
+                                {userMenuOpen && customerUser && (
+                                    <motion.div
+                                        className={styles.userDropdown}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                    >
+                                        <div className={styles.userDropdownHeader}>
+                                            <p className={styles.userRoleTag}>CUSTOMER</p>
+                                            <p className={styles.userEmail}>{customerUser.email}</p>
+                                        </div>
+                                        <hr />
+                                        <Link to="/account" onClick={() => setUserMenuOpen(false)} className={styles.dropdownItem}>
+                                            <User size={16} /> My Account Dashboard
+                                        </Link>
+                                        <Link to="/account/orders" onClick={() => setUserMenuOpen(false)} className={styles.dropdownItem}>
+                                            <Package size={16} /> My Orders
+                                        </Link>
+                                        <button onClick={() => { logoutCustomer(); setUserMenuOpen(false); navigate('/'); }} className={styles.dropdownItemLogout}>
+                                            <LogOut size={16} /> Logout
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Mobile Menu Dropdown */}
+                {/* Mobile Menu Dropdown / Drawer */}
                 <AnimatePresence>
                     {isOpen && (
                         <motion.div
@@ -174,8 +181,8 @@ const Navbar = () => {
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </div>
-        </nav>
+            </nav>
+        </header>
     );
 };
 

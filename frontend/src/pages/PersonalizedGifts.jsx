@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Heart, Sparkles, Camera, Image as ImageIcon, Gift } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { useCart } from '../context/CartContext';
+import { getProductDisplayPrice, getProductRegularPrice } from '../utils/productUtils';
 import styles from './PersonalizedGifts.module.css';
 
 const PersonalizedGifts = () => {
@@ -177,7 +178,7 @@ const PersonalizedGifts = () => {
                                             onClick={() => toggleWishlist(product)}
                                             title="Add to Wishlist"
                                         >
-                                            <Heart size={18} fill={isInWishlist(product.id) ? '#B76E79' : 'none'} />
+                                            <Heart size={18} fill={isInWishlist(product.id) ? '#ff6600' : 'none'} />
                                         </button>
                                         <span className={styles.customBadge}>✨ Customizable</span>
                                     </div>
@@ -185,9 +186,9 @@ const PersonalizedGifts = () => {
                                         <span className={styles.categoryTag}>{product.category || 'Personalized Gift'}</span>
                                         <h3 className={styles.productName}>{product.name}</h3>
                                         <div className={styles.priceRow}>
-                                            <span className={styles.salePrice}>₹{product.salePrice || product.price}</span>
-                                            {product.regularPrice && product.regularPrice > (product.salePrice || product.price) && (
-                                                <span className={styles.regularPrice}>₹{product.regularPrice}</span>
+                                            <span className={styles.salePrice}>₹{getProductDisplayPrice(product)}</span>
+                                            {getProductRegularPrice(product) > 0 && (
+                                                <span className={styles.regularPrice}>₹{getProductRegularPrice(product)}</span>
                                             )}
                                         </div>
                                         <Link to={`/product/${product.id}`} className={styles.customizeBtn}>

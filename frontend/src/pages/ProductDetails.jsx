@@ -42,21 +42,21 @@ const ProductDetails = () => {
                 {/* Additional Information */}
                 <div className={styles.infoGrid}>
                     <div className={styles.infoCard}>
-                        <ShieldCheck size={28} color="#B76E79" />
+                        <ShieldCheck size={28} color="#ff6600" />
                         <div>
                             <h4>100% Quality Guaranteed</h4>
                             <p>Studio-grade HD prints with acrylic glass & solid wooden frame construction.</p>
                         </div>
                     </div>
                     <div className={styles.infoCard}>
-                        <Truck size={28} color="#B76E79" />
+                        <Truck size={28} color="#ff6600" />
                         <div>
                             <h4>Express Delivery Available</h4>
                             <p>Safely packed in multi-layered bubble packaging and shipped via fast courier.</p>
                         </div>
                     </div>
                     <div className={styles.infoCard}>
-                        <Clock size={28} color="#B76E79" />
+                        <Clock size={28} color="#ff6600" />
                         <div>
                             <h4>Fast Production Time</h4>
                             <p>Orders are edited, printed, and framed within 24-48 hours of photo submission.</p>

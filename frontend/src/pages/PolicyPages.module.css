@@ -3,7 +3,7 @@
 }
 
 .header {
-    background: linear-gradient(135deg, var(--color-primary), #a05a65);
+    background: linear-gradient(135deg, #ff6600, #e55b00);
     color: white;
     padding: 3rem 0;
     text-align: center;

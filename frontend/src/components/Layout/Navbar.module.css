@@ -1,49 +1,64 @@
-.navbar {
+.navbarWrapper {
     position: sticky;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 1000;
-    background-color: rgba(255, 250, 240, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(183, 110, 121, 0.15);
+}
+
+.topAnnouncementBar {
+    background-color: #ff6600;
+    color: #000000;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    letter-spacing: 0.3px;
+}
+
+.navbar {
+    width: 100%;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
     transition: all 0.3s ease;
 }
 
 .scrolled {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    background-color: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 .navContainer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 0.8rem;
-    padding-bottom: 0.8rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
 }
 
 .logo {
     display: flex;
     flex-direction: column;
     text-decoration: none;
+    align-items: center;
 }
 
 .brandPrimary {
     font-family: var(--font-heading);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 800;
-    color: var(--color-primary);
-    letter-spacing: 0.5px;
-    line-height: 1.1;
+    color: #ff6600;
+    letter-spacing: 1px;
+    line-height: 1;
 }
 
 .brandSub {
     font-size: 0.65rem;
     font-weight: 700;
-    color: var(--color-text-dark);
-    letter-spacing: 2px;
+    color: #111827;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
+    margin-top: 2px;
 }
 
 .desktopMenu {
@@ -132,7 +147,7 @@
 }
 
 .loginBtn:hover {
-    background-color: #a05a65;
+    background-color: #e55b00;
 }
 
 .userBtn {
@@ -140,7 +155,7 @@
     align-items: center;
     gap: 0.4rem;
     background: transparent;
-    border: 1px solid rgba(183, 110, 121, 0.3);
+    border: 1px solid rgba(255, 102, 0, 0.3);
     padding: 0.4rem 0.8rem;
     border-radius: 50px;
     cursor: pointer;
@@ -221,12 +236,18 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--color-text-dark);
+    color: #111827;
+    padding: 4px;
+}
+
+.desktopOnly {
+    display: flex;
 }
 
 @media (max-width: 960px) {
-    .desktopMenu {
-        display: none;
+    .desktopMenu,
+    .desktopOnly {
+        display: none !important;
     }
 
     .menuToggle {
@@ -238,9 +259,11 @@
         top: 100%;
         left: 0;
         width: 100%;
-        background-color: white;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        padding: 1.5rem;
+        background-color: #ffffff;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        padding: 1.25rem 1.5rem;
+        z-index: 10002;
+        border-bottom: 2px solid #ff6600;
     }
 
     .mobileMenu ul {
@@ -251,19 +274,21 @@
 
     .mobileLink {
         font-size: 1rem;
-        font-weight: 500;
-        color: var(--color-text-dark);
+        font-weight: 600;
+        color: #1f2937;
+        padding: 0.4rem 0;
     }
 
     .mobileBtn {
         width: 100%;
-        padding: 0.8rem;
-        background-color: var(--color-primary);
+        padding: 0.75rem;
+        background-color: #ff6600;
         color: white;
         border: none;
-        border-radius: 50px;
-        font-weight: 600;
+        border-radius: 25px;
+        font-weight: 700;
         cursor: pointer;
         text-align: center;
+        font-size: 0.95rem;
     }
 }

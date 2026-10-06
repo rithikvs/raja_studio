@@ -1,0 +1,51 @@
+.basketFloatBtn {
+    position: fixed;
+    bottom: 25px;
+    right: 100px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.basketFloatBtn:hover {
+    transform: scale(1.08);
+}
+
+.basketBadge {
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    margin-bottom: -8px;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.basketBox {
+    background-color: #ffffff;
+    border-radius: 12px;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e5e7eb;
+}
+
+@media (max-width: 768px) {
+    .basketFloatBtn {
+        bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+        right: 12px;
+    }
+}

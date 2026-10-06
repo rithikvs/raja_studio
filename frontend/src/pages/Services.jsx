@@ -142,22 +142,22 @@ const Services = () => {
                     <h2 className="section-title text-center">Why Choose Us</h2>
                     <div className={styles.featuresGrid}>
                         <div className={styles.feature}>
-                            <Truck size={40} color="#B76E79" />
+                            <Truck size={40} color="#ff6600" />
                             <h3>Fast Delivery</h3>
                             <p>Express shipping available for urgent orders with safe packaging</p>
                         </div>
                         <div className={styles.feature}>
-                            <ShieldCheck size={40} color="#B76E79" />
+                            <ShieldCheck size={40} color="#ff6600" />
                             <h3>Quality Guarantee</h3>
                             <p>100% satisfaction guaranteed or full refund on defective products</p>
                         </div>
                         <div className={styles.feature}>
-                            <Sparkles size={40} color="#B76E79" />
+                            <Sparkles size={40} color="#ff6600" />
                             <h3>HD Printing</h3>
                             <p>Studio-grade printers ensure vibrant colors and sharp details</p>
                         </div>
                         <div className={styles.feature}>
-                            <Heart size={40} color="#B76E79" />
+                            <Heart size={40} color="#ff6600" />
                             <h3>Affordable Pricing</h3>
                             <p>Competitive prices with special discounts on bulk orders</p>
                         </div>

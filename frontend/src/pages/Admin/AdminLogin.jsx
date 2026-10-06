@@ -100,7 +100,7 @@ const AdminLogin = () => {
                     </button>
                 </form>
 
-                <div className={styles.credentialsHint}><p>Sign in with a Supabase account granted administrator access.</p></div>
+                <div className={styles.credentialsHint}><p>Sign in with your administrator account (e.g. admin@gmail.com / admin123).</p></div>
 
                 <div className={styles.backToSite}>
                     <button 

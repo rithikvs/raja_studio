@@ -14,16 +14,45 @@ export const DataProvider = ({ children }) => {
 
     const refreshData = async () => {
         try {
-            const [{ products: remoteProducts }, ordersResult, customersResult] = await Promise.all([
-                api('/admin/products').catch(() => api('/products')), api('/admin/orders').catch(() => api('/orders').catch(() => ({ orders: [] }))), api('/admin/customers').catch(() => ({ customers: [] }))
-            ]);
-            setProducts(remoteProducts);
-            setOrders(ordersResult.orders);
-            setCustomers(customersResult.customers);
-        } catch {
-            // Keeps non-production visual content usable before the API is configured.
-            setProducts(db.getProducts()); setOrders([]); setCustomers([]);
+            // Fetch products (public endpoint /api/products works for everyone, logged in or guest)
+            let loadedProducts = [];
+            try {
+                const res = await api('/products');
+                loadedProducts = res.products || [];
+            } catch (pErr) {
+                try {
+                    const res = await api('/admin/products');
+                    loadedProducts = res.products || [];
+                } catch {
+                    loadedProducts = db.getProducts();
+                }
+            }
+
+            if (!loadedProducts || loadedProducts.length === 0) {
+                loadedProducts = db.getProducts();
+            }
+
+            setProducts(loadedProducts);
+        } catch (err) {
+            console.error('Failed to load products:', err);
+            setProducts(db.getProducts());
         }
+
+        // Fetch orders and customers if authenticated (non-blocking for guests)
+        try {
+            const ordersRes = await api('/admin/orders').catch(() => api('/orders').catch(() => ({ orders: [] })));
+            setOrders(ordersRes.orders || []);
+        } catch {
+            setOrders([]);
+        }
+
+        try {
+            const customersRes = await api('/admin/customers').catch(() => ({ customers: [] }));
+            setCustomers(customersRes.customers || []);
+        } catch {
+            setCustomers([]);
+        }
+
         setCategories(db.getCategories());
         setCoupons(db.getCoupons());
         setCms(db.getCMS());

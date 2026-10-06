@@ -15,29 +15,8 @@ const statuses = ['Pending', 'Confirmed', 'Photo Review', 'Printing', 'Ready', '
 const client = new MongoClient(process.env.MONGODB_URI || 'mongodb://invalid'); let database;
 const r2 = new S3Client({ region: process.env.CLOUDFLARE_R2_REGION || 'auto', endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`, credentials: { accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID || '', secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY || '' } });
 // Safe dynamic CORS configuration
-const allowedOrigins = (process.env.CLIENT_ORIGIN || "")
-  .split(",")
-  .map(origin => origin.trim())
-  .filter(Boolean);
-
-// Fallback for local development if CLIENT_ORIGIN not set
-if (allowedOrigins.length === 0) {
-  allowedOrigins.push('http://localhost:5173', 'http://localhost:5174');
-}
-
 app.use(cors({
-  origin(origin, callback) {
-    // Allow requests with no origin (like mobile apps, Postman, or same-origin)
-    if (!origin || allowedOrigins.includes(origin)) {
-      if (origin) {
-        console.log('✅ CORS allowed origin:', origin);
-      }
-      return callback(null, true);
-    }
-    console.error('❌ CORS rejected origin:', origin);
-    console.error('   Allowed origins:', allowedOrigins);
-    return callback(new Error('Not allowed by CORS'));
-  },
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -98,16 +77,19 @@ app.post('/api/auth/register', async (req, res) => {
   const { name, email, phone, password } = req.body; 
   console.log('📝 Registration attempt:', { email, phone });
   
-  if (!name || !email || !phone || !password) return fail(res, 400, 'Name, email, phone, and password are required.'); 
-  if (password.length < 8) return fail(res, 400, 'Password must have at least 8 characters.'); 
+  if (!name || !email || !password) return fail(res, 400, 'Name, email, and password are required.'); 
+  if (password.length < 6) return fail(res, 400, 'Password must have at least 6 characters.'); 
   
   const normalized = email.trim().toLowerCase(); 
-  if (await database.collection('users').findOne({ $or: [{ email: normalized }, { phone }] })) {
+  const userPhone = phone ? phone.trim() : '';
+  const query = userPhone ? { $or: [{ email: normalized }, { phone: userPhone }] } : { email: normalized };
+
+  if (await database.collection('users').findOne(query)) {
     console.log('❌ Registration failed: Email or phone already exists');
     return fail(res, 409, 'An account with this email or phone already exists.');
   }
   
-  const user = { full_name: name.trim(), email: normalized, phone, password_hash: await bcrypt.hash(password, 12), is_admin: false, created_at: new Date(), updated_at: new Date() }; 
+  const user = { full_name: name.trim(), email: normalized, phone: userPhone, password_hash: await bcrypt.hash(password, 12), is_admin: false, created_at: new Date(), updated_at: new Date() }; 
   const result = await database.collection('users').insertOne(user); 
   user._id = result.insertedId; 
   const token = jwt.sign({ id: user._id.toString(), is_admin: false }, process.env.JWT_SECRET, { expiresIn: '365d' }); 
@@ -122,11 +104,20 @@ app.post('/api/auth/login', async (req, res) => {
     console.log('🔐 Login attempt from:', origin);
     console.log('   User-Agent:', userAgent.substring(0, 100));
     
-    const email = req.body.email?.trim().toLowerCase(); 
-    const user = await database.collection('users').findOne({ $or: [{ email }, { phone: req.body.email }] }); 
+    const rawInput = (req.body.email || '').trim();
+    const normalizedEmail = rawInput.toLowerCase();
+    const phoneDigits = rawInput.replace(/\D/g, '');
+
+    const user = await database.collection('users').findOne({
+      $or: [
+        { email: normalizedEmail },
+        { email: new RegExp('^' + normalizedEmail.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&') + '$', 'i') },
+        ...(phoneDigits ? [{ phone: phoneDigits }, { phone: rawInput }, { phone: rawInput.replace(/^0+/, '') }] : [])
+      ]
+    });
     
     if (!user || !(await bcrypt.compare(req.body.password || '', user.password_hash))) {
-      console.log('❌ Login failed: Invalid credentials for', email || req.body.email);
+      console.log('❌ Login failed: Invalid credentials for', rawInput);
       return fail(res, 401, 'Invalid email/phone or password.');
     }
     
@@ -448,7 +439,7 @@ client.connect().then(async () => {
   ]); 
   
   // Log CORS configuration
-  console.log('🌐 CORS enabled for origins:', allowedOrigins);
+  console.log('🌐 CORS enabled for all origins');
   console.log('🚀 Raja Studio MongoDB API listening on port', port);
   
   // Bind to 0.0.0.0 to accept connections from any network interface (required for Render)

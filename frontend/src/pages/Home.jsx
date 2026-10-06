@@ -6,6 +6,7 @@ import styles from './Home.module.css';
 import Button from '../components/UI/Button';
 import { useData } from '../context/DataContext';
 import { useCart } from '../context/CartContext';
+import { getProductDisplayPrice, getProductRegularPrice } from '../utils/productUtils';
 
 const Home = () => {
     const { products, categories, cms } = useData();
@@ -104,7 +105,7 @@ const Home = () => {
                         </div>
                     ) : (
                         <div className={styles.emptyStateBox}>
-                            <ImageIcon size={48} color="#B76E79" />
+                            <ImageIcon size={48} color="#ff6600" />
                             <h3>No categories created yet</h3>
                             <p>Categories added by Admin will appear here instantly.</p>
                         </div>
@@ -112,18 +113,55 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Featured / Best Seller Products Grid */}
+            {/* Today's Best Deal Section */}
+            <section className="section-padding" style={{ backgroundColor: '#ffffff' }}>
+                <div className="container">
+                    <h2 className={styles.sectionHeaderTitle}>Today's Best Deal</h2>
+
+                    {activeProducts.length > 0 ? (
+                        <div className={styles.productsGrid}>
+                            {(bestSellers.length > 0 ? bestSellers : activeProducts).slice(0, 4).map((product) => (
+                                <div key={product.id} className={styles.productCard}>
+                                    <div className={styles.productImageWrapper}>
+                                        <img src={product.image || (product.images && product.images[0]) || 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&auto=format&fit=crop&q=80'} alt={product.name} />
+                                    </div>
+                                    <div className={styles.productContent}>
+                                        <h3 className={styles.productName}>{product.name}</h3>
+                                        <div className={styles.priceRow}>
+                                            {getProductRegularPrice(product) > 0 && (
+                                                <span className={styles.regularPrice}>₹ {getProductRegularPrice(product).toFixed(2)}</span>
+                                            )}
+                                            <span className={styles.salePrice}>₹ {getProductDisplayPrice(product).toFixed(2)}</span>
+                                        </div>
+                                        <Link to={`/product/${product.id}`} className={styles.selectOptionsBtn}>
+                                            <ShoppingBag size={16} /> Select options
+                                        </Link>
+                                        <button
+                                            type="button"
+                                            className={`${styles.wishlistSubLink} ${isInWishlist(product.id) ? styles.inWishlist : ''}`}
+                                            onClick={() => toggleWishlist(product)}
+                                        >
+                                            <Heart size={16} fill={isInWishlist(product.id) ? '#ff6600' : 'none'} color={isInWishlist(product.id) ? '#ff6600' : '#374151'} />
+                                            <span>{isInWishlist(product.id) ? 'In Wishlist' : 'Add to Wishlist'}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className={styles.emptyStateBox}>
+                            <Gift size={48} color="#ff6600" />
+                            <h3>No Products Available Currently</h3>
+                            <p>Products added by Admin will appear here immediately.</p>
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* Featured Products Section */}
             <section className="section-padding">
                 <div className="container">
-                    <div className={styles.sectionHeaderFlex}>
-                        <div>
-                            <h2 className="section-title">Best Sellers & Featured Gifts</h2>
-                            <p className="section-subtitle">Handpicked personalized designs loved by our customers</p>
-                        </div>
-                        <Link to="/shop" className={styles.viewAllLink}>
-                            View All Products <ChevronRight size={16} />
-                        </Link>
-                    </div>
+                    <h2 className={styles.sectionHeaderTitle}>Featured Products</h2>
 
                     {activeProducts.length > 0 ? (
                         <div className={styles.productsGrid}>
@@ -131,38 +169,31 @@ const Home = () => {
                                 <div key={product.id} className={styles.productCard}>
                                     <div className={styles.productImageWrapper}>
                                         <img src={product.image || (product.images && product.images[0]) || 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&auto=format&fit=crop&q=80'} alt={product.name} />
-                                        <button
-                                            className={`${styles.wishlistBtn} ${isInWishlist(product.id) ? styles.inWishlist : ''}`}
-                                            onClick={() => toggleWishlist(product)}
-                                            title="Add to Wishlist"
-                                        >
-                                            <Heart size={18} fill={isInWishlist(product.id) ? '#B76E79' : 'none'} />
-                                        </button>
-                                        <span className={styles.customBadge}>✨ Customizable</span>
                                     </div>
                                     <div className={styles.productContent}>
-                                        <span className={styles.categoryTag}>{product.category || 'Personalized Gift'}</span>
                                         <h3 className={styles.productName}>{product.name}</h3>
                                         <div className={styles.priceRow}>
-                                            <span className={styles.salePrice}>₹{product.salePrice || product.price}</span>
-                                            {product.regularPrice && product.regularPrice > (product.salePrice || product.price) && (
-                                                <span className={styles.regularPrice}>₹{product.regularPrice}</span>
+                                            {getProductRegularPrice(product) > 0 && (
+                                                <span className={styles.regularPrice}>₹ {getProductRegularPrice(product).toFixed(2)}</span>
                                             )}
+                                            <span className={styles.salePrice}>₹ {getProductDisplayPrice(product).toFixed(2)}</span>
                                         </div>
-                                        <Link to={`/product/${product.id}`} className={styles.customizeBtn}>
-                                            <Sparkles size={16} /> Customize & Order
+                                        <Link to={`/product/${product.id}`} className={styles.selectOptionsBtn}>
+                                            <ShoppingBag size={16} /> Select options
                                         </Link>
+                                        <button
+                                            type="button"
+                                            className={`${styles.wishlistSubLink} ${isInWishlist(product.id) ? styles.inWishlist : ''}`}
+                                            onClick={() => toggleWishlist(product)}
+                                        >
+                                            <Heart size={16} fill={isInWishlist(product.id) ? '#ff6600' : 'none'} color={isInWishlist(product.id) ? '#ff6600' : '#374151'} />
+                                            <span>{isInWishlist(product.id) ? 'In Wishlist' : 'Add to Wishlist'}</span>
+                                        </button>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    ) : (
-                        <div className={styles.emptyStateBox}>
-                            <Gift size={48} color="#B76E79" />
-                            <h3>No Products Available Currently</h3>
-                            <p>Products added by Admin will appear here immediately for customers to browse and order.</p>
-                        </div>
-                    )}
+                    ) : null}
                 </div>
             </section>
 
@@ -212,17 +243,17 @@ const Home = () => {
 
                     <div className={styles.benefitsGrid}>
                         <div className={styles.benefitCard}>
-                            <ShieldCheck size={36} color="#B76E79" />
+                            <ShieldCheck size={36} color="#ff6600" />
                             <h3>Ultra HD Printing</h3>
                             <p>We use studio-grade photo printers ensuring vivid colors, sharp detail, and long-lasting non-fading print quality.</p>
                         </div>
                         <div className={styles.benefitCard}>
-                            <Gift size={36} color="#B76E79" />
+                            <Gift size={36} color="#ff6600" />
                             <h3>Custom Framing & Finishes</h3>
                             <p>Hand-built wooden and synthetic frames with matte, glossy, and glitter protective lamination coatings.</p>
                         </div>
                         <div className={styles.benefitCard}>
-                            <Truck size={36} color="#B76E79" />
+                            <Truck size={36} color="#ff6600" />
                             <h3>Safe & Express Shipping</h3>
                             <p>Multi-layer bubble wrap gift packaging ensuring your personalized frames arrive safely without scratches or breakage.</p>
                         </div>

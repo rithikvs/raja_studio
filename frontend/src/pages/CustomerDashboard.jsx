@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import { useCart } from '../context/CartContext';
 import InvoiceModal from '../components/UI/InvoiceModal';
+import { getProductDisplayPrice } from '../utils/productUtils';
 import styles from './CustomerDashboard.module.css';
 
 const CustomerDashboard = () => {
@@ -237,7 +238,7 @@ const CustomerDashboard = () => {
                                                 <img src={p.image || (p.images && p.images[0]) || 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=300&auto=format&fit=crop&q=80'} alt={p.name} />
                                                 <div className={styles.pCardBody}>
                                                     <h4>{p.name}</h4>
-                                                    <p className={styles.productPrice}>₹{p.salePrice || p.price}</p>
+                                                    <p className={styles.productPrice}>₹{getProductDisplayPrice(p)}</p>
                                                     <div className={styles.productActions}>
                                                         <Link to={`/product/${p.id}`} className={styles.customizeBtn}>
                                                             Customize & Order

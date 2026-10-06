@@ -38,7 +38,7 @@ const Categories = () => {
                                             <img src={category.image} alt={category.name} />
                                         ) : (
                                             <div className={styles.placeholderImage}>
-                                                <Package size={48} color="#B76E79" />
+                                                <Package size={48} color="#ff6600" />
                                             </div>
                                         )}
                                         <div className={styles.overlay}>

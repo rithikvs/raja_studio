@@ -4,7 +4,7 @@
 }
 
 .pageHeader {
-    background: linear-gradient(135deg, #B76E79, #a05a65);
+    background: linear-gradient(135deg, #ff6600, #e55b00);
     color: white;
     padding: 3rem 0;
     text-align: center;
@@ -93,7 +93,7 @@
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
     background: white;
-    color: #B76E79;
+    color: #ff6600;
     border-radius: 50px;
     font-weight: 600;
     font-size: 0.95rem;
@@ -139,7 +139,7 @@
 .shopBtn {
     display: inline-block;
     padding: 0.875rem 2rem;
-    background: #B76E79;
+    background: #ff6600;
     color: white;
     border: none;
     border-radius: 50px;
@@ -149,7 +149,7 @@
 }
 
 .shopBtn:hover {
-    background: #a05a65;
+    background: #e55b00;
 }
 
 .quickLinks {
@@ -189,8 +189,8 @@
 }
 
 .quickLink:hover {
-    border-color: #B76E79;
-    color: #B76E79;
+    border-color: #ff6600;
+    color: #ff6600;
     transform: translateY(-4px);
 }
 

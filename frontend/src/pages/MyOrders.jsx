@@ -55,7 +55,7 @@ const MyOrders = () => {
             case 'confirmed':
                 return <CheckCircle size={18} color="#3b82f6" />;
             case 'photo review':
-                return <Eye size={18} color="#8b5cf6" />;
+                return <Eye size={18} color="#ea580c" />;
             case 'printing':
             case 'ready':
                 return <Package size={18} color="#06b6d4" />;
@@ -77,7 +77,7 @@ const MyOrders = () => {
             case 'confirmed':
                 return '#3b82f6';
             case 'photo review':
-                return '#8b5cf6';
+                return '#ea580c';
             case 'printing':
             case 'ready':
                 return '#06b6d4';

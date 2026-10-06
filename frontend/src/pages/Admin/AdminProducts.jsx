@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, Copy, Search, Upload, Sliders, Image as ImageIcon, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { useAdmin } from '../../context/AdminContext';
+import { getProductDisplayPrice } from '../../utils/productUtils';
 import styles from './AdminProducts.module.css';
 
 const AdminProducts = () => {
@@ -379,8 +380,8 @@ const AdminProducts = () => {
                                         </div>
                                     </td>
                                     <td>{p.category || 'Uncategorized'}</td>
-                                    <td>₹{p.regularPrice || p.price}</td>
-                                    <td className={styles.salePriceCol}>₹{p.salePrice || p.price}</td>
+                                     <td>₹{p.regularPrice || getProductDisplayPrice(p)}</td>
+                                     <td className={styles.salePriceCol}>₹{p.salePrice || getProductDisplayPrice(p)}</td>
                                     <td>{p.stock}</td>
                                     <td>
                                         <button

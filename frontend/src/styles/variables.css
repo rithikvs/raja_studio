@@ -1,35 +1,37 @@
 :root {
-    /* Colors */
-    --color-primary: #B76E79;
-    /* Rose Gold */
-    --color-secondary: #FFD1DC;
-    /* Pastel Pink */
-    --color-accent: #F5F5DC;
-    /* Cream/Beige */
-    --color-text-dark: #4A4036;
-    /* Soft Brown */
-    --color-text-light: #FDFBF7;
-    /* Off-white for dark backgrounds */
+    /* Brand & Accent Colors */
+    --color-orange: #FF6600;
+    --color-orange-hover: #E55B00;
+    --color-primary: #FF6600;
+    --color-primary-dark: #E55B00;
+    --color-secondary: #FFF0E6;
+    --color-accent: #F9FAFB;
+    --color-text-dark: #111827;
+    --color-text-muted: #6B7280;
+    --color-text-light: #F9FAFB;
     --color-white: #FFFFFF;
-    --color-bg-light: #FFFAF0;
-    /* Floral White */
+    --color-bg-light: #F9FAFB;
+    --color-border: #E5E7EB;
+    --color-price-regular: #D9534F;
 
     /* Fonts */
-    --font-heading: 'Playfair Display', serif;
-    --font-body: 'Poppins', sans-serif;
+    --font-heading: 'Quicksand', 'Jost', sans-serif;
+    --font-body: 'Jost', 'Poppins', sans-serif;
 
     /* Spacing */
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
     --spacing-md: 2rem;
-    --spacing-lg: 4rem;
-    --spacing-xl: 6rem;
+    --spacing-lg: 3rem;
+    --spacing-xl: 5rem;
 
     /* Transitions */
-    --transition-fast: 0.3s ease;
-    --transition-medium: 0.5s ease-in-out;
+    --transition-fast: 0.25s ease;
+    --transition-medium: 0.4s ease-in-out;
 
-    /* Shadows */
-    --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
+    /* Shadows & Radius */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.08);
+    --border-radius-card: 16px;
+    --border-radius-btn: 25px;
 }

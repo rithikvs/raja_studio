@@ -3,6 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { Search, Filter, Sparkles, Heart, Gift } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { useCart } from '../context/CartContext';
+import { getProductDisplayPrice, getProductRegularPrice } from '../utils/productUtils';
 import styles from './Shop.module.css';
 
 const Shop = () => {
@@ -34,11 +35,12 @@ const Shop = () => {
         const matchesSearch = (product.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
             (product.description || '').toLowerCase().includes(searchQuery.toLowerCase());
         const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-        const matchesPrice = (product.salePrice || product.price || 0) <= maxPrice;
+        const displayPrice = getProductDisplayPrice(product);
+        const matchesPrice = displayPrice <= maxPrice;
         return matchesSearch && matchesCategory && matchesPrice;
     }).sort((a, b) => {
-        if (sortBy === 'price-low') return (a.salePrice || a.price) - (b.salePrice || b.price);
-        if (sortBy === 'price-high') return (b.salePrice || b.price) - (a.salePrice || a.price);
+        if (sortBy === 'price-low') return getProductDisplayPrice(a) - getProductDisplayPrice(b);
+        if (sortBy === 'price-high') return getProductDisplayPrice(b) - getProductDisplayPrice(a);
         return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
     });
 
@@ -130,32 +132,33 @@ const Shop = () => {
                                                 src={product.image || (product.images && product.images[0]) || 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&auto=format&fit=crop&q=80'}
                                                 alt={product.name}
                                             />
-                                            <button
-                                                className={`${styles.wishlistBtn} ${isInWishlist(product.id) ? styles.inWishlist : ''}`}
-                                                onClick={() => toggleWishlist(product)}
-                                            >
-                                                <Heart size={18} fill={isInWishlist(product.id) ? '#B76E79' : 'none'} />
-                                            </button>
                                         </div>
                                         <div className={styles.productContent}>
-                                            <span className={styles.categoryTag}>{product.category || 'Personalized Gift'}</span>
                                             <h3 className={styles.productName}>{product.name}</h3>
                                             <div className={styles.priceRow}>
-                                                <span className={styles.salePrice}>₹{product.salePrice || product.price}</span>
-                                                {product.regularPrice && product.regularPrice > (product.salePrice || product.price) && (
-                                                    <span className={styles.regularPrice}>₹{product.regularPrice}</span>
+                                                {getProductRegularPrice(product) > 0 && (
+                                                    <span className={styles.regularPrice}>₹ {getProductRegularPrice(product).toFixed(2)}</span>
                                                 )}
+                                                <span className={styles.salePrice}>₹ {getProductDisplayPrice(product).toFixed(2)}</span>
                                             </div>
-                                            <Link to={`/product/${product.id}`} className={styles.customizeBtn}>
-                                                <Sparkles size={16} /> Customize & Order
+                                            <Link to={`/product/${product.id}`} className={styles.selectOptionsBtn}>
+                                                <ShoppingBag size={16} /> Select options
                                             </Link>
+                                            <button
+                                                type="button"
+                                                className={`${styles.wishlistSubLink} ${isInWishlist(product.id) ? styles.inWishlist : ''}`}
+                                                onClick={() => toggleWishlist(product)}
+                                            >
+                                                <Heart size={16} fill={isInWishlist(product.id) ? '#ff6600' : 'none'} color={isInWishlist(product.id) ? '#ff6600' : '#374151'} />
+                                                <span>{isInWishlist(product.id) ? 'In Wishlist' : 'Add to Wishlist'}</span>
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
                             <div className={styles.emptyState}>
-                                <Gift size={48} color="#B76E79" />
+                                <Gift size={48} color="#ff6600" />
                                 <h3>No matching products found</h3>
                                 <p>Try adjusting your search query or category filter.</p>
                             </div>

@@ -55,7 +55,7 @@ img {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #A05A65;
+  background: #e55b00;
 }
 
 /* Utilities */
@@ -99,7 +99,7 @@ img {
 }
 
 .btn-primary:hover {
-  background-color: #A05A65;
+  background-color: #e55b00;
   /* Darker Rose Gold */
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);

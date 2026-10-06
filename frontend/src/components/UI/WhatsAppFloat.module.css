@@ -1,69 +1,56 @@
-.floatBtn {
+.floatBtnWrapper {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
+    bottom: 25px;
+    left: 25px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #ffffff;
+    padding: 4px 14px 4px 4px;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e5e7eb;
+    z-index: 999;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.floatBtnWrapper:hover {
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.25);
+}
+
+.iconCircle {
+    width: 38px;
+    height: 38px;
     background-color: #25D366;
-    color: white;
     border-radius: 50%;
     display: flex;
-    justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
-    z-index: 1000;
-    cursor: pointer;
-    border: 2px solid #fff;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.4);
 }
 
-.floatBtn:hover {
-    background-color: #1FB855;
-    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
-}
-
-.tooltip {
-    position: absolute;
-    right: 75px;
-    background-color: white;
-    color: #333;
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
+.pillText {
     font-size: 0.85rem;
-    font-weight: 500;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
+    font-weight: 700;
+    color: #1f2937;
     white-space: nowrap;
 }
 
-.floatBtn:hover .tooltip {
-    opacity: 1;
-    visibility: visible;
-    right: 80px;
-}
-
-/* Pulse Animation */
-.floatBtn::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background-color: #25D366;
-    opacity: 0.5;
-    z-index: -1;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 0.5;
+@media (max-width: 768px) {
+    .floatBtnWrapper {
+        bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+        left: 12px;
+        padding: 3px 10px 3px 3px;
     }
 
-    100% {
-        transform: scale(1.6);
-        opacity: 0;
+    .iconCircle {
+        width: 32px;
+        height: 32px;
+    }
+
+    .pillText {
+        font-size: 0.78rem;
     }
 }

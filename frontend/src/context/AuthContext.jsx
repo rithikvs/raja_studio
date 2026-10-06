@@ -87,10 +87,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginCustomer = (email, password) => authenticate('/auth/login', { email, password });
+  const loginCustomer = (email, password) => authenticate('/auth/login', { email: (email || '').trim(), password });
 
   const registerCustomer = ({ name, email, phone, password, confirmPassword }) => {
-    if (password !== confirmPassword) {
+    if (confirmPassword && password !== confirmPassword) {
       return Promise.resolve({ success: false, message: 'Password and Confirm Password do not match.' });
     }
     return authenticate('/auth/register', { name, email, phone, password });

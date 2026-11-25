@@ -2,30 +2,33 @@
     position: fixed;
     bottom: 30px;
     right: 30px;
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    background-color: #000000;
-    color: #ffffff;
-    border: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: var(--color-forest-green);
+    border: 1.5px solid var(--color-champagne-gold);
+    color: var(--color-golden-yellow);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 18px rgba(6, 78, 59, 0.3);
     z-index: 998;
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .backToTopBtn:hover {
-    background-color: #222222;
+    background: var(--gradient-gold);
+    color: var(--color-forest-green);
+    border-color: var(--color-accent-gold);
+    box-shadow: var(--shadow-gold);
     transform: translateY(-2px);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .backToTopBtn {
-        bottom: calc(125px + env(safe-area-inset-bottom, 0px));
-        right: 12px;
+        bottom: calc(130px + env(safe-area-inset-bottom, 0px));
+        right: 14px;
         width: 42px;
         height: 42px;
     }

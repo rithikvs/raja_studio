@@ -11,11 +11,13 @@ const WishlistPage = () => {
     if (wishlist.length === 0) {
         return (
             <div className={`container section-padding ${styles.emptyWishlist}`}>
-                <Heart size={64} color="#ff6600" />
+                <div className={styles.emptyIconBox}>
+                    <Heart size={52} color="#D4AF37" />
+                </div>
                 <h2>Your Wishlist is Empty</h2>
-                <p>Explore our personalized gifts and click the heart icon to save your favorite items.</p>
+                <p>Explore our boutique collections and click the heart icon to save your favorite gifts.</p>
                 <Link to="/shop" className={styles.shopBtn}>
-                    <ArrowLeft size={16} /> Explore Products
+                    <ArrowLeft size={16} /> Explore Special Collections
                 </Link>
             </div>
         );

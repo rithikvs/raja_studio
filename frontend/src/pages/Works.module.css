@@ -3,10 +3,11 @@
 }
 
 .pageHeader {
-    background: linear-gradient(135deg, #ff6600, #e55b00);
+    background: linear-gradient(135deg, var(--color-emerald-deep), var(--color-forest-green));
     color: white;
     padding: 3.5rem 0;
     text-align: center;
+    border-bottom: 2px solid var(--color-champagne-gold);
 }
 
 .pageHeader h1 {
@@ -39,8 +40,9 @@
 .statNumber {
     font-size: 3rem;
     font-weight: 700;
-    color: #ff6600;
+    color: var(--color-champagne-gold);
     margin-bottom: 0.5rem;
+    font-family: var(--font-heading);
 }
 
 .statLabel {
@@ -71,14 +73,14 @@
 }
 
 .filterButtons button:hover {
-    border-color: #ff6600;
-    color: #ff6600;
+    border-color: var(--color-emerald-deep);
+    color: var(--color-emerald-deep);
 }
 
 .filterButtons button.active {
-    background: #ff6600;
-    color: white;
-    border-color: #ff6600;
+    background: var(--color-emerald-deep);
+    color: var(--color-golden-yellow);
+    border-color: var(--color-emerald-deep);
 }
 
 /* Gallery */
@@ -223,15 +225,17 @@
 
 /* CTA Section */
 .ctaSection {
-    background: linear-gradient(135deg, #ff6600, #e55b00);
+    background: linear-gradient(135deg, var(--color-forest-green), var(--color-emerald-deep));
     color: white;
     padding: 4rem 0;
     text-align: center;
+    border-top: 2px solid var(--color-champagne-gold);
 }
 
 .ctaSection h2 {
     font-size: 2.5rem;
     margin-bottom: 1rem;
+    font-family: var(--font-heading);
 }
 
 .ctaSection p {
@@ -261,14 +265,14 @@
 }
 
 .primaryBtn {
-    background: white;
-    color: #ff6600;
+    background: var(--color-champagne-gold);
+    color: var(--color-forest-green);
 }
 
 .secondaryBtn {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.12);
     color: white;
-    border: 2px solid white;
+    border: 2px solid var(--color-champagne-gold);
 }
 
 .primaryBtn:hover,

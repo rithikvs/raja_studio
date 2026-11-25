@@ -4,6 +4,7 @@ import { Plus, Edit, Trash2, Copy, Search, Upload, Sliders, Image as ImageIcon, 
 import { useData } from '../../context/DataContext';
 import { useAdmin } from '../../context/AdminContext';
 import { getProductDisplayPrice } from '../../utils/productUtils';
+import { compressImage } from '../../utils/imageUtils';
 import styles from './AdminProducts.module.css';
 
 const AdminProducts = () => {
@@ -129,82 +130,41 @@ const AdminProducts = () => {
         setIsFormOpen(true);
     };
 
-    const handleMainImageUpload = (e) => {
+    const handleMainImageUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        
-        // Compress image before converting to base64
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                // Resize image to max 800x800 for faster upload
-                let width = img.width;
-                let height = img.height;
-                const maxSize = 800;
-                
-                if (width > height && width > maxSize) {
-                    height = (height * maxSize) / width;
-                    width = maxSize;
-                } else if (height > maxSize) {
-                    width = (width * maxSize) / height;
-                    height = maxSize;
-                }
-                
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                // Convert to base64 with compression (0.8 quality)
-                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
-                setFormData(prev => ({ ...prev, image: compressedBase64 }));
-            };
-            img.src = evt.target.result;
-        };
-        reader.readAsDataURL(file);
+        try {
+            const compressed = await compressImage(file, { maxWidth: 800, maxHeight: 800, quality: 0.82 });
+            setFormData(prev => ({ ...prev, image: compressed }));
+        } catch (err) {
+            console.error('Product image compression failed:', err);
+            const reader = new FileReader();
+            reader.onload = (evt) => setFormData(prev => ({ ...prev, image: evt.target.result }));
+            reader.readAsDataURL(file);
+        }
     };
 
-    const handleGalleryUpload = (e) => {
+    const handleGalleryUpload = async (e) => {
         const files = Array.from(e.target.files);
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    
-                    // Resize gallery images to max 600x600
-                    let width = img.width;
-                    let height = img.height;
-                    const maxSize = 600;
-                    
-                    if (width > height && width > maxSize) {
-                        height = (height * maxSize) / width;
-                        width = maxSize;
-                    } else if (height > maxSize) {
-                        width = (width * maxSize) / height;
-                        height = maxSize;
-                    }
-                    
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    // Convert to base64 with compression
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        for (const file of files) {
+            try {
+                const compressed = await compressImage(file, { maxWidth: 600, maxHeight: 600, quality: 0.75 });
+                setFormData(prev => ({
+                    ...prev,
+                    galleryImages: [...prev.galleryImages, compressed]
+                }));
+            } catch (err) {
+                console.error('Gallery image compression failed:', err);
+                const reader = new FileReader();
+                reader.onload = (evt) => {
                     setFormData(prev => ({
                         ...prev,
-                        galleryImages: [...prev.galleryImages, compressedBase64]
+                        galleryImages: [...prev.galleryImages, evt.target.result]
                     }));
                 };
-                img.src = evt.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
+                reader.readAsDataURL(file);
+            }
+        }
     };
 
     const handleRemoveGalleryImage = (index) => {

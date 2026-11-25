@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet, Navigate, useNavigate, Link } from 'react-router-dom';
-import { LayoutDashboard, Package, Grid, ShoppingBag, Users, Tag, FileText, Home, LogOut, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Package, Grid, ShoppingBag, Users, Tag, FileText, Home, LogOut, ShieldCheck, Film } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import styles from './AdminLayout.module.css';
 
@@ -57,6 +57,10 @@ const AdminLayout = () => {
 
                     <NavLink to="/admin/cms" className={({ isActive }) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}>
                         <FileText size={18} /> Website Content & CMS
+                    </NavLink>
+
+                    <NavLink to="/admin/media" className={({ isActive }) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}>
+                        <Film size={18} /> Video & Design Media
                     </NavLink>
                 </nav>
 

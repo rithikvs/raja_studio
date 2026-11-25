@@ -3,10 +3,11 @@
 }
 
 .pageHeader {
-    background: linear-gradient(135deg, #ff6600, #e55b00);
+    background: linear-gradient(135deg, var(--color-emerald-deep), var(--color-forest-green));
     color: white;
     padding: 2.5rem 0;
     text-align: center;
+    border-bottom: 2px solid var(--color-champagne-gold);
 }
 
 .pageHeader h1 {
@@ -411,7 +412,8 @@
 }
 
 .customizeBtn:hover {
-    background: #e55b00;
+    background: var(--color-luxury-green);
+    color: var(--color-golden-yellow);
 }
 
 .wishlistBtn {
@@ -498,7 +500,7 @@
 }
 
 .shopNowBtn:hover {
-    background: #e55b00;
+    background: var(--color-luxury-green);
 }
 
 /* Welcome Text */

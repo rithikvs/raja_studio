@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Upload, Grid, RefreshCw } from 'lucide-react';
 import { useData } from '../../context/DataContext';
+import { compressImage } from '../../utils/imageUtils';
 import styles from './AdminCategories.module.css';
 
 const AdminCategories = () => {
@@ -37,12 +38,18 @@ const AdminCategories = () => {
         setIsFormOpen(true);
     };
 
-    const handleImageUpload = (e) => {
+    const handleImageUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (evt) => setImage(evt.target.result);
-        reader.readAsDataURL(file);
+        try {
+            const compressed = await compressImage(file, { maxWidth: 800, maxHeight: 800, quality: 0.82 });
+            setImage(compressed);
+        } catch (err) {
+            console.error('Image compression failed:', err);
+            const reader = new FileReader();
+            reader.onload = (evt) => setImage(evt.target.result);
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleSubmit = (e) => {

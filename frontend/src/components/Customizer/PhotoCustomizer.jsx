@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { getProductDisplayPrice, getProductRegularPrice } from '../../utils/productUtils';
+import { compressImage } from '../../utils/imageUtils';
 import styles from './PhotoCustomizer.module.css';
 
 const PhotoCustomizer = ({ product }) => {
@@ -76,14 +77,13 @@ const PhotoCustomizer = ({ product }) => {
         setSelectedOptions(prev => ({ ...prev, [optionName]: optionLabel }));
     };
 
-    const handlePhotoUpload = (e) => {
+    const handlePhotoUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
         setCustomPhotoFile(file);
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const dataUrl = event.target.result;
+        try {
+            const dataUrl = await compressImage(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.85 });
             setCustomPhoto(dataUrl);
 
             const img = new Image();
@@ -91,16 +91,37 @@ const PhotoCustomizer = ({ product }) => {
                 const w = img.width;
                 const h = img.height;
                 let quality = 'Good Quality';
-                if (w >= 1800 && h >= 1200) {
+                if (w >= 1000 && h >= 800) {
                     quality = 'Excellent Quality';
-                } else if (w < 800 || h < 600) {
+                } else if (w < 600 || h < 400) {
                     quality = 'Low Quality';
                 }
                 setPhotoQuality({ width: w, height: h, quality, fileName: file.name });
             };
             img.src = dataUrl;
-        };
-        reader.readAsDataURL(file);
+        } catch (err) {
+            console.error('Photo compression fallback:', err);
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const dataUrl = event.target.result;
+                setCustomPhoto(dataUrl);
+
+                const img = new Image();
+                img.onload = () => {
+                    const w = img.width;
+                    const h = img.height;
+                    let quality = 'Good Quality';
+                    if (w >= 1800 && h >= 1200) {
+                        quality = 'Excellent Quality';
+                    } else if (w < 800 || h < 600) {
+                        quality = 'Low Quality';
+                    }
+                    setPhotoQuality({ width: w, height: h, quality, fileName: file.name });
+                };
+                img.src = dataUrl;
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleAction = (isBuyNow = false) => {
@@ -281,7 +302,7 @@ const PhotoCustomizer = ({ product }) => {
                     className={`${styles.wishlistSubBtn} ${isInWishlist(product.id) ? styles.inWishlist : ''}`}
                     onClick={() => toggleWishlist(product)}
                 >
-                    <Heart size={18} fill={isInWishlist(product.id) ? '#ff6600' : 'none'} color={isInWishlist(product.id) ? '#ff6600' : '#4b5563'} />
+                    <Heart size={18} fill={isInWishlist(product.id) ? '#D4AF37' : 'none'} color={isInWishlist(product.id) ? '#D4AF37' : '#064E3B'} />
                     <span>{isInWishlist(product.id) ? 'In Wishlist' : 'Add to Wishlist'}</span>
                 </button>
 

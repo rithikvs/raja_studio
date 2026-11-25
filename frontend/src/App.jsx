@@ -34,6 +34,8 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Services from './pages/Services';
 import Works from './pages/Works';
+import VideoEditing from './pages/VideoEditing';
+import LogoPosterEditing from './pages/LogoPosterEditing';
 import { FAQPage, ShippingPage, ReturnsPage, PrivacyPage, TermsPage } from './pages/PolicyPages';
 
 // Admin Portal
@@ -46,6 +48,7 @@ import AdminOrders from './pages/Admin/AdminOrders';
 import AdminCustomers from './pages/Admin/AdminCustomers';
 import AdminCoupons from './pages/Admin/AdminCoupons';
 import AdminCMS from './pages/Admin/AdminCMS';
+import AdminMedia from './pages/Admin/AdminMedia';
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -111,6 +114,8 @@ function App() {
                                     <Route path="/contact" element={<Contact />} />
                                     <Route path="/services" element={<Services />} />
                                     <Route path="/works" element={<Works />} />
+                                    <Route path="/video-editing" element={<VideoEditing />} />
+                                    <Route path="/logo-poster-editing" element={<LogoPosterEditing />} />
                                     <Route path="/faq" element={<FAQPage />} />
                                     <Route path="/shipping" element={<ShippingPage />} />
                                     <Route path="/returns" element={<ReturnsPage />} />
@@ -130,6 +135,7 @@ function App() {
                                     <Route path="customers" element={<AdminCustomers />} />
                                     <Route path="coupons" element={<AdminCoupons />} />
                                     <Route path="cms" element={<AdminCMS />} />
+                                    <Route path="media" element={<AdminMedia />} />
                                 </Route>
                             </Routes>
                             <LoginModal />

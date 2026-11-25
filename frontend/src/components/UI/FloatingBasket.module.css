@@ -1,7 +1,7 @@
 .basketFloatBtn {
     position: fixed;
-    bottom: 25px;
-    right: 100px;
+    bottom: 30px;
+    right: 90px;
     z-index: 999;
     display: flex;
     flex-direction: column;
@@ -15,8 +15,8 @@
 }
 
 .basketBadge {
-    background-color: #000000;
-    color: #ffffff;
+    background: var(--gradient-gold);
+    color: var(--color-forest-green);
     font-size: 0.75rem;
     font-weight: 800;
     min-width: 20px;
@@ -28,24 +28,30 @@
     padding: 0 4px;
     margin-bottom: -8px;
     z-index: 2;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    border: 1px solid #FFFFFF;
 }
 
 .basketBox {
-    background-color: #ffffff;
-    border-radius: 12px;
-    width: 46px;
-    height: 46px;
+    background-color: var(--color-emerald-deep);
+    border: 1.5px solid var(--color-champagne-gold);
+    border-radius: 14px;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    border: 1px solid #e5e7eb;
+    box-shadow: 0 6px 20px rgba(6, 78, 59, 0.35);
+    color: var(--color-golden-yellow);
 }
 
-@media (max-width: 768px) {
+.basketBox svg {
+    color: var(--color-golden-yellow) !important;
+}
+
+@media (max-width: 900px) {
     .basketFloatBtn {
-        bottom: calc(68px + env(safe-area-inset-bottom, 0px));
-        right: 12px;
+        bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+        right: 14px;
     }
 }

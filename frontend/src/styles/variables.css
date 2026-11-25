@@ -1,22 +1,53 @@
 :root {
-    /* Brand & Accent Colors */
-    --color-orange: #FF6600;
-    --color-orange-hover: #E55B00;
-    --color-primary: #FF6600;
-    --color-primary-dark: #E55B00;
-    --color-secondary: #FFF0E6;
-    --color-accent: #F9FAFB;
-    --color-text-dark: #111827;
-    --color-text-muted: #6B7280;
-    --color-text-light: #F9FAFB;
+    /* STRICT BRAND IDENTITY – GREEN AND GOLD PALETTE */
+    --color-emerald-deep: #064E3B;
+    --color-forest-green: #0B3D2E;
+    --color-luxury-green: #145A42;
+    --color-golden-yellow: #F5C542;
+    --color-champagne-gold: #D4AF37;
+    --color-warm-cream: #FFFDF5;
+
+    /* Semantic Theme Aliases */
+    --color-primary: #064E3B;
+    --color-primary-dark: #0B3D2E;
+    --color-primary-light: #145A42;
+    --color-accent-gold: #D4AF37;
+    --color-accent-yellow: #F5C542;
+    --color-gold-hover: #E5B82A;
+
+    --color-header-bg: #064E3B;
+    --color-footer-bg: #0B3D2E;
+    --color-bg-light: #FFFDF5;
+    --color-bg-warm: #FAF6EB;
+    --color-surface: #FFFFFF;
     --color-white: #FFFFFF;
-    --color-bg-light: #F9FAFB;
-    --color-border: #E5E7EB;
-    --color-price-regular: #D9534F;
+
+    /* Borders */
+    --color-border: rgba(212, 175, 55, 0.28);
+    --color-border-subtle: rgba(212, 175, 55, 0.16);
+    --color-border-gold: #D4AF37;
+    --color-border-light: #EFE7DA;
+
+    /* Text Colors */
+    --color-text-dark: #0B1C15;
+    --color-text-main: #1C2E26;
+    --color-text-muted: #5E7267;
+    --color-text-light: #FFFDF5;
+    --color-text-gold: #D4AF37;
+    --color-price-regular: #94A3B8;
+    --color-price-sale: #064E3B;
+
+    /* Luxury Gradients */
+    --gradient-emerald-gold: linear-gradient(135deg, #064E3B 0%, #145A42 55%, #D4AF37 100%);
+    --gradient-emerald-dark: linear-gradient(180deg, #064E3B 0%, #0B3D2E 100%);
+    --gradient-gold: linear-gradient(135deg, #F5C542 0%, #D4AF37 100%);
+    --gradient-gold-reverse: linear-gradient(135deg, #D4AF37 0%, #F5C542 100%);
+    --gradient-card-cream: linear-gradient(180deg, #FFFFFF 0%, #FFFDF5 100%);
 
     /* Fonts */
-    --font-heading: 'Quicksand', 'Jost', sans-serif;
-    --font-body: 'Jost', 'Poppins', sans-serif;
+    --font-heading: 'Playfair Display', 'Quicksand', Georgia, serif;
+    --font-subheading: 'Quicksand', 'Jost', sans-serif;
+    --font-body: 'Jost', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
 
     /* Spacing */
     --spacing-xs: 0.5rem;
@@ -26,12 +57,17 @@
     --spacing-xl: 5rem;
 
     /* Transitions */
-    --transition-fast: 0.25s ease;
-    --transition-medium: 0.4s ease-in-out;
+    --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-medium: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-smooth: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 
     /* Shadows & Radius */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.08);
+    --shadow-sm: 0 2px 10px rgba(6, 78, 59, 0.05);
+    --shadow-md: 0 8px 24px rgba(6, 78, 59, 0.09);
+    --shadow-lg: 0 16px 40px rgba(6, 78, 59, 0.14);
+    --shadow-gold: 0 6px 20px rgba(212, 175, 55, 0.3);
+    --shadow-emerald: 0 8px 25px rgba(6, 78, 59, 0.25);
+    --border-radius-sm: 8px;
     --border-radius-card: 16px;
-    --border-radius-btn: 25px;
+    --border-radius-btn: 50px;
 }

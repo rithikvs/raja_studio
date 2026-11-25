@@ -11,6 +11,8 @@ export const DataProvider = ({ children }) => {
     const [customers, setCustomers] = useState([]);
     const [coupons, setCoupons] = useState([]);
     const [cms, setCms] = useState(db.getCMS());
+    const [videoSamples, setVideoSamples] = useState(db.getVideoSamples());
+    const [designSamples, setDesignSamples] = useState(db.getDesignSamples());
 
     const refreshData = async () => {
         try {
@@ -55,7 +57,19 @@ export const DataProvider = ({ children }) => {
 
         setCategories(db.getCategories());
         setCoupons(db.getCoupons());
-        setCms(db.getCMS());
+        try {
+            const cmsRes = await api('/cms').catch(() => null);
+            if (cmsRes && cmsRes.cms && Object.keys(cmsRes.cms).length > 0) {
+                db.saveCMS(cmsRes.cms);
+                setCms(cmsRes.cms);
+            } else {
+                setCms(db.getCMS());
+            }
+        } catch {
+            setCms(db.getCMS());
+        }
+        setVideoSamples(db.getVideoSamples());
+        setDesignSamples(db.getDesignSamples());
     };
 
     useEffect(() => {
@@ -86,50 +100,150 @@ export const DataProvider = ({ children }) => {
             coupons,
             cms,
             refreshData,
+            refreshCMS: async () => {
+                try {
+                    const res = await api('/cms').catch(() => null);
+                    if (res && res.cms && Object.keys(res.cms).length > 0) {
+                        db.saveCMS(res.cms);
+                        setCms(res.cms);
+                        return res.cms;
+                    }
+                } catch (e) {
+                    console.warn('refreshCMS fallback to local db:', e);
+                }
+                const localCms = db.getCMS();
+                setCms(localCms);
+                return localCms;
+            },
+            refreshCategories: async () => {
+                setCategories(db.getCategories());
+            },
             // Action shortcuts
             addProduct: async (product) => { 
-                const result = await api('/admin/products', { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(product) 
-                }); 
-                // Optimistic update - add immediately without full refresh
-                setProducts(prev => [result.product, ...prev]);
-                return result.product;
+                try {
+                    const result = await api('/admin/products', { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify(product) 
+                    }); 
+                    const saved = result.product || product;
+                    setProducts(prev => [saved, ...prev]);
+                    db.addProduct(saved);
+                    return saved;
+                } catch (err) {
+                    console.warn('API add product fallback to local DB:', err);
+                    const saved = db.addProduct(product);
+                    setProducts(prev => [saved, ...prev]);
+                    return saved;
+                }
             },
             updateProduct: async (productId, product) => { 
-                const result = await api(`/admin/products/${productId}`, { 
-                    method: 'PATCH', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(product) 
-                }); 
-                // Optimistic update - update immediately without full refresh
-                setProducts(prev => prev.map(p => p.id === productId ? result.product : p));
-                return result.product;
+                try {
+                    const result = await api(`/admin/products/${productId}`, { 
+                        method: 'PATCH', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify(product) 
+                    }); 
+                    const saved = result.product || { ...product, id: productId };
+                    setProducts(prev => prev.map(p => p.id === productId ? saved : p));
+                    db.updateProduct(productId, product);
+                    return saved;
+                } catch (err) {
+                    console.warn('API update product fallback to local DB:', err);
+                    db.updateProduct(productId, product);
+                    setProducts(prev => prev.map(p => p.id === productId ? { ...p, ...product } : p));
+                    return { ...product, id: productId };
+                }
             },
             deleteProduct: async (productId) => { 
-                await api(`/admin/products/${productId}`, { method: 'DELETE' }); 
-                // Optimistic update - remove immediately without full refresh
+                try {
+                    await api(`/admin/products/${productId}`, { method: 'DELETE' }); 
+                } catch (err) {
+                    console.warn('API delete product fallback to local DB:', err);
+                }
+                db.deleteProduct(productId);
                 setProducts(prev => prev.filter(p => p.id !== productId));
             },
-            addCategory: db.addCategory,
-            updateCategory: db.updateCategory,
-            deleteCategory: db.deleteCategory,
+            addCategory: (category) => {
+                const newCat = db.addCategory(category);
+                setCategories(prev => [...prev, newCat]);
+                return newCat;
+            },
+            updateCategory: (id, fields) => {
+                db.updateCategory(id, fields);
+                setCategories(prev => prev.map(c => c.id === id ? { ...c, ...fields } : c));
+            },
+            deleteCategory: (id) => {
+                db.deleteCategory(id);
+                setCategories(prev => prev.filter(c => c.id !== id));
+            },
             addOrder: db.addOrder,
             updateOrderStatus: async (id, status) => { 
-                await api(`/admin/orders/${id}/status`, { 
-                    method: 'PATCH', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ status }) 
-                }); 
-                // Optimistic update - update immediately without full refresh
+                try {
+                    await api(`/admin/orders/${id}/status`, { 
+                        method: 'PATCH', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ status }) 
+                    }); 
+                } catch (err) {
+                    console.warn('API status update fallback to local DB:', err);
+                }
+                db.updateOrderStatus(id, status);
                 setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
             },
             saveCustomer: db.saveCustomer,
-            deleteCustomer: db.deleteCustomer,
-            addCoupon: db.addCoupon,
-            deleteCoupon: db.deleteCoupon,
-            saveCMS: db.saveCMS
+            deleteCustomer: (id) => {
+                db.deleteCustomer(id);
+                setCustomers(prev => prev.filter(c => c.id !== id));
+            },
+            addCoupon: (coupon) => {
+                const newCoup = db.addCoupon(coupon);
+                setCoupons(prev => [...prev, newCoup]);
+                return newCoup;
+            },
+            deleteCoupon: (id) => {
+                db.deleteCoupon(id);
+                setCoupons(prev => prev.filter(c => c.id !== id));
+            },
+            saveCMS: (newCms) => {
+                setCms(newCms);
+                db.saveCMS(newCms);
+                api('/cms', { 
+                    method: 'PUT', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(newCms) 
+                }).catch(() => {});
+            },
+            videoSamples,
+            designSamples,
+            addVideoSample: (video) => {
+                const newVid = db.addVideoSample(video);
+                setVideoSamples(prev => [newVid, ...prev]);
+                return newVid;
+            },
+            updateVideoSample: (id, fields) => {
+                const updated = db.updateVideoSample(id, fields);
+                setVideoSamples(prev => prev.map(v => v.id === id ? { ...v, ...fields } : v));
+                return updated;
+            },
+            deleteVideoSample: (id) => {
+                db.deleteVideoSample(id);
+                setVideoSamples(prev => prev.filter(v => v.id !== id));
+            },
+            addDesignSample: (design) => {
+                const newDes = db.addDesignSample(design);
+                setDesignSamples(prev => [newDes, ...prev]);
+                return newDes;
+            },
+            updateDesignSample: (id, fields) => {
+                const updated = db.updateDesignSample(id, fields);
+                setDesignSamples(prev => prev.map(d => d.id === id ? { ...d, ...fields } : d));
+                return updated;
+            },
+            deleteDesignSample: (id) => {
+                db.deleteDesignSample(id);
+                setDesignSamples(prev => prev.filter(d => d.id !== id));
+            }
         }}>
             {children}
         </DataContext.Provider>

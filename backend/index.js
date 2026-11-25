@@ -23,22 +23,21 @@ app.use(cors({
 })); 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-// Accept all image formats - jpg, jpeg, png, gif, bmp, webp, svg, heic, heif, etc.
+// Accept all image and video formats
 const upload = multer({ 
     storage: multer.memoryStorage(), 
     limits: { 
         fileSize: maxUploadBytes,
-        fieldSize: 50 * 1024 * 1024, // 50MB for large base64 images
+        fieldSize: 50 * 1024 * 1024, // 50MB for large base64 media
         fields: 50, // Max number of non-file fields
         files: 20 // Max number of file uploads
     }, 
     fileFilter: (_req, file, cb) => {
-        // Accept if no mimetype specified OR if mimetype starts with 'image/'
-        // This allows all common image formats
-        if (!file.mimetype || file.mimetype.startsWith('image/')) {
+        // Accept images and video files
+        if (!file.mimetype || file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
             cb(null, true);
         } else {
-            cb(new Error('Only image files are allowed'));
+            cb(new Error('Only image and video files are allowed'));
         }
     }
 });
@@ -407,6 +406,67 @@ app.get('/api/admin/images/:imageId/url', auth, admin, async (req, res) => {
         return fail(res, 500, 'Failed to retrieve image');
     }
 });
+
+// Admin Media Upload endpoint (for videos, posters, logos & banner images)
+app.post('/api/admin/media/upload', auth, admin, upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return fail(res, 400, 'No file was uploaded.');
+        }
+        const file = req.file;
+        const isVideo = file.mimetype?.startsWith('video/');
+        const hasR2Config = process.env.CLOUDFLARE_ACCOUNT_ID && 
+                           process.env.CLOUDFLARE_R2_ACCESS_KEY_ID && 
+                           process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY && 
+                           process.env.CLOUDFLARE_R2_BUCKET_NAME;
+
+        if (hasR2Config) {
+            const ext = file.originalname?.split('.').pop() || (isVideo ? 'mp4' : 'jpg');
+            const key = `media/${isVideo ? 'videos' : 'images'}/${crypto.randomUUID()}.${ext}`;
+            await r2.send(new PutObjectCommand({
+                Bucket: process.env.CLOUDFLARE_R2_BUCKET_NAME,
+                Key: key,
+                Body: file.buffer,
+                ContentType: file.mimetype
+            }));
+            const publicUrl = process.env.CLOUDFLARE_R2_PUBLIC_URL 
+                ? `${process.env.CLOUDFLARE_R2_PUBLIC_URL}/${key}`
+                : key;
+            return res.json({ url: publicUrl, filename: file.originalname, mimetype: file.mimetype, size: file.size });
+        } else {
+            // Data URL fallback - reliably stores image or short clip
+            const dataUrl = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+            return res.json({ url: dataUrl, filename: file.originalname, mimetype: file.mimetype, size: file.size });
+        }
+    } catch (err) {
+        console.error('Media upload error:', err);
+        return fail(res, 500, 'Failed to process media upload.');
+    }
+});
+
+// CMS Configuration Cloud Endpoints
+app.get('/api/cms', async (_req, res) => {
+    try {
+        const cmsDoc = await database.collection('cms').findOne({ _id: 'studio_gift_shop_cms' });
+        res.json({ cms: cmsDoc ? cmsDoc.data : null });
+    } catch (err) {
+        res.json({ cms: null });
+    }
+});
+
+app.put('/api/cms', auth, admin, async (req, res) => {
+    try {
+        const data = req.body;
+        await database.collection('cms').updateOne(
+            { _id: 'studio_gift_shop_cms' },
+            { $set: { data, updated_at: new Date() } },
+            { upsert: true }
+        );
+        res.json({ ok: true });
+    } catch (err) {
+        return fail(res, 500, 'Failed to save CMS data.');
+    }
+});
 app.use((error, _req, res, next) => { 
     void next; 
     console.error('Server error:', error);
@@ -422,8 +482,8 @@ app.use((error, _req, res, next) => {
         return fail(res, 400, `Image upload error: ${error.message}`); 
     }
     
-    if (error.message === 'Only image files are allowed') {
-        return fail(res, 400, 'Only image files are allowed. Supported formats: JPG, PNG, GIF, WEBP, BMP, SVG, HEIC, HEIF');
+    if (error.message === 'Only image files are allowed' || error.message === 'Only image and video files are allowed') {
+        return fail(res, 400, 'Only image and video files are allowed.');
     }
     
     return fail(res, 500, error.message || 'Internal server error'); 

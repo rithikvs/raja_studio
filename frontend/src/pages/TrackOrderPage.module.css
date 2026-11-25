@@ -3,10 +3,11 @@
 }
 
 .pageHeader {
-    background: linear-gradient(135deg, #ff6600, #e55b00);
+    background: linear-gradient(135deg, var(--color-emerald-deep), var(--color-forest-green));
     color: white;
     padding: 3rem 0;
     text-align: center;
+    border-bottom: 2px solid var(--color-champagne-gold);
 }
 
 .pageHeader h1 {

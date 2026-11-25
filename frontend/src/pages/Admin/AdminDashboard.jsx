@@ -98,7 +98,7 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className={styles.statCard}>
-                    <div className={styles.statIcon} style={{ backgroundColor: '#f3e8ff', color: '#9333ea' }}>
+                    <div className={styles.statIcon} style={{ backgroundColor: '#fef3c7', color: '#b45309' }}>
                         <Users size={24} />
                     </div>
                     <div>

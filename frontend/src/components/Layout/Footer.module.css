@@ -1,22 +1,290 @@
+/* ===================================================
+   STUDIO GIFT SHOP – NEST DARK FOREST GREEN FOOTER
+   Brand colors: #0B3D2E, #064E3B, #D4AF37, #F5C542, #FFFDF5
+=================================================== */
+
 .footer {
-    background-color: var(--color-text-dark);
-    color: var(--color-text-light);
-    padding-top: 4rem;
-    padding-bottom: 2rem;
+    background-color: var(--color-forest-green);
+    color: var(--color-warm-cream);
+    padding-top: 0;
     margin-top: 4rem;
+    border-top: 2px solid var(--color-champagne-gold);
+    position: relative;
 }
 
+/* TOP VALUE STRIP */
+.footerTopStrip {
+    background: rgba(6, 78, 59, 0.6);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 1.8rem 0;
+}
+
+.topStripContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.topStripItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.goldIcon {
+    color: var(--color-golden-yellow);
+    flex-shrink: 0;
+}
+
+.topStripItem h4 {
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #FFFDF5;
+    margin-bottom: 0.15rem;
+}
+
+.topStripItem p {
+    font-size: 0.82rem;
+    color: rgba(255, 253, 245, 0.75);
+    margin: 0;
+}
+
+/* MAIN FOOTER CONTAINER */
 .footerContainer {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    grid-template-columns: 2fr 1.1fr 1.1fr 1.4fr;
     gap: 2.5rem;
+    padding-top: 3.5rem;
     padding-bottom: 3rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* BRAND COLUMN */
+.brandCol {
+    display: flex;
+    flex-direction: column;
+}
+
+.footerLogo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.logoBadge {
+    width: 44px;
+    height: 44px;
+    background: var(--color-emerald-deep);
+    border: 1.5px solid var(--color-champagne-gold);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logoText {
+    display: flex;
+    flex-direction: column;
+}
+
+.brandName {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #FFFDF5;
+    letter-spacing: 0.8px;
+    line-height: 1.1;
+}
+
+.brandSubtitle {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--color-champagne-gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.brandStory {
+    font-size: 0.9rem;
+    color: rgba(255, 253, 245, 0.8);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    max-width: 360px;
+}
+
+.socialGroup {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.socialCircle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: var(--color-warm-cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.socialCircle:hover {
+    background: var(--gradient-gold);
+    color: var(--color-forest-green);
+    border-color: var(--color-accent-gold);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-gold);
+}
+
+/* LINKS COLUMNS */
+.linksCol {
+    display: flex;
+    flex-direction: column;
+}
+
+.colTitle {
+    font-family: var(--font-heading);
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #FFFDF5;
+    margin-bottom: 0.4rem;
+}
+
+.goldUnderline {
+    width: 35px;
+    height: 2px;
+    background: var(--gradient-gold);
+    margin-bottom: 1.25rem;
+    border-radius: 2px;
+}
+
+.linksList {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.linksList a {
+    font-size: 0.9rem;
+    color: rgba(255, 253, 245, 0.8);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    display: inline-block;
+}
+
+.linksList a:hover {
+    color: var(--color-golden-yellow);
+    transform: translateX(4px);
+}
+
+/* CONTACT COLUMN */
+.contactCol {
+    display: flex;
+    flex-direction: column;
+}
+
+.contactList {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.contactList li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.88rem;
+}
+
+.contactIcon {
+    color: var(--color-golden-yellow);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.contactLabel {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--color-champagne-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.contactVal {
+    color: rgba(255, 253, 245, 0.9);
+    text-decoration: none;
+    line-height: 1.5;
+    transition: color var(--transition-fast);
+}
+
+.contactVal:hover {
+    color: var(--color-golden-yellow);
+}
+
+/* COPYRIGHT STRIP */
+.copyrightStrip {
+    background: rgba(0, 0, 0, 0.25);
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 1.2rem 0;
+}
+
+.copyrightContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.copyrightText {
+    font-size: 0.84rem;
+    color: rgba(255, 253, 245, 0.75);
+    margin: 0;
+}
+
+.copyrightText strong {
+    color: var(--color-golden-yellow);
+}
+
+.paymentMethods {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.payBadge {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: var(--color-warm-cream);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+}
+
+/* RESPONSIVE FOOTER */
 @media (max-width: 990px) {
+    .topStripContainer {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+    }
+
     .footerContainer {
         grid-template-columns: 1fr 1fr;
+        gap: 2rem;
     }
 }
 
@@ -24,81 +292,9 @@
     .footerContainer {
         grid-template-columns: 1fr;
     }
-}
 
-.logo {
-    font-family: var(--font-heading);
-    font-size: 1.8rem;
-    color: var(--color-secondary);
-    margin-bottom: 0.5rem;
-}
-
-.tagline {
-    font-size: 0.9rem;
-    opacity: 0.85;
-    line-height: 1.6;
-    margin-bottom: 1.25rem;
-}
-
-.socials {
-    display: flex;
-    gap: 0.75rem;
-}
-
-.socialIcon {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s, transform 0.2s;
-}
-
-.socialIcon:hover {
-    background-color: var(--color-primary);
-    transform: translateY(-2px);
-}
-
-.linksSection h3,
-.contactSection h3 {
-    font-size: 1.1rem;
-    color: var(--color-secondary);
-    margin-bottom: 1.25rem;
-    font-family: var(--font-heading);
-}
-
-.linksSection ul,
-.contactSection ul {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-}
-
-.linksSection a {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    transition: opacity 0.2s, color 0.2s;
-}
-
-.linksSection a:hover {
-    opacity: 1;
-    color: var(--color-secondary);
-}
-
-.contactSection li {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    font-size: 0.9rem;
-    opacity: 0.85;
-}
-
-.copyright {
-    text-align: center;
-    padding-top: 2rem;
-    font-size: 0.85rem;
-    opacity: 0.7;
+    .copyrightContainer {
+        flex-direction: column;
+        text-align: center;
+    }
 }

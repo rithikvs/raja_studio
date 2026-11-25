@@ -2,57 +2,83 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0.8rem 2rem;
-    border-radius: 50px;
+    gap: 0.6rem;
+    padding: 0.85rem 2.2rem;
+    border-radius: var(--border-radius-btn);
     font-family: var(--font-body);
-    font-weight: 500;
-    font-size: 1rem;
+    font-weight: 600;
+    font-size: 0.98rem;
+    letter-spacing: 0.3px;
     border: none;
     cursor: pointer;
     outline: none;
     text-decoration: none;
-    transition: box-shadow var(--transition-fast);
+    transition: all var(--transition-fast);
 }
 
 .primary {
     background-color: var(--color-primary);
-    color: var(--color-white);
-    box-shadow: var(--shadow-sm);
+    color: #FFFFFF;
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    box-shadow: 0 4px 15px rgba(6, 78, 59, 0.25);
 }
 
 .primary:hover {
-    background-color: #e55b00;
-    box-shadow: var(--shadow-md);
+    background: var(--gradient-gold);
+    color: var(--color-primary-dark);
+    box-shadow: var(--shadow-gold);
+    border-color: var(--color-accent-gold);
 }
 
 .secondary {
-    background-color: var(--color-secondary);
-    color: var(--color-text-dark);
+    background-color: var(--color-warm-cream);
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-champagne-gold);
+    box-shadow: var(--shadow-sm);
 }
 
 .secondary:hover {
-    background-color: #FFC0CB;
+    background-color: var(--color-primary);
+    color: var(--color-golden-yellow);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
 }
 
 .outline {
     background-color: transparent;
-    border: 2px solid var(--color-primary);
-    color: var(--color-primary);
+    border: 1.5px solid var(--color-champagne-gold);
+    color: var(--color-champagne-gold);
 }
 
 .outline:hover {
-    background-color: var(--color-primary);
-    color: var(--color-white);
+    background: var(--gradient-gold);
+    color: var(--color-primary-dark);
+    border-color: var(--color-accent-gold);
+    box-shadow: var(--shadow-gold);
 }
 
 .dark {
-    background-color: #333;
-    color: #fff;
+    background-color: var(--color-forest-green);
+    color: var(--color-warm-cream);
+    border: 1px solid rgba(212, 175, 55, 0.3);
     box-shadow: var(--shadow-sm);
 }
 
 .dark:hover {
-    background-color: #000;
-    box-shadow: var(--shadow-md);
+    background: var(--gradient-gold);
+    color: var(--color-primary-dark);
+    box-shadow: var(--shadow-gold);
+}
+
+.gold {
+    background: var(--gradient-gold);
+    color: var(--color-primary-dark);
+    font-weight: 700;
+    box-shadow: var(--shadow-gold);
+}
+
+.gold:hover {
+    background: var(--gradient-gold-reverse);
+    color: var(--color-primary-dark);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.45);
 }

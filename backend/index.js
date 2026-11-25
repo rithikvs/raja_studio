@@ -3,6 +3,9 @@ import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { MongoClient, ObjectId } from 'mongodb';
@@ -10,7 +13,25 @@ import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } fro
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 dotenv.config();
 
-const app = express(); const port = Number(process.env.PORT || 8787); const maxUploadBytes = Number(process.env.MAX_UPLOAD_BYTES || 26214400);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Ensure local media upload directories exist
+const uploadsDir = path.join(__dirname, 'uploads');
+const videosDir = path.join(uploadsDir, 'videos');
+const imagesDir = path.join(uploadsDir, 'images');
+try {
+  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+  if (!fs.existsSync(videosDir)) fs.mkdirSync(videosDir, { recursive: true });
+  if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
+} catch (dirErr) {
+  console.warn('Could not initialize uploads directory:', dirErr.message);
+}
+
+const app = express(); 
+const port = Number(process.env.PORT || 8787); 
+// Default upload limit: 100MB for 4K/FHD video reels and high-res posters
+const maxUploadBytes = Number(process.env.MAX_UPLOAD_BYTES || 104857600);
 const statuses = ['Pending', 'Confirmed', 'Photo Review', 'Printing', 'Ready', 'Shipped', 'Delivered', 'Cancelled'];
 const client = new MongoClient(process.env.MONGODB_URI || 'mongodb://invalid'); let database;
 const r2 = new S3Client({ region: process.env.CLOUDFLARE_R2_REGION || 'auto', endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`, credentials: { accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID || '', secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY || '' } });
@@ -21,8 +42,18 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 })); 
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+
+// Serve static uploads (videos and images) with caching and streaming support
+app.use('/uploads', express.static(uploadsDir, {
+  maxAge: '7d',
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.mp4') || filePath.endsWith('.webm') || filePath.endsWith('.mov')) {
+      res.setHeader('Accept-Ranges', 'bytes');
+    }
+  }
+}));
 // Accept all image and video formats
 const upload = multer({ 
     storage: multer.memoryStorage(), 
@@ -420,9 +451,12 @@ app.post('/api/admin/media/upload', auth, admin, upload.single('file'), async (r
                            process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY && 
                            process.env.CLOUDFLARE_R2_BUCKET_NAME;
 
+        const rawExt = file.originalname?.split('.').pop() || '';
+        const ext = rawExt ? rawExt.toLowerCase() : (isVideo ? 'mp4' : 'jpg');
+        const filename = `${crypto.randomUUID()}.${ext}`;
+
         if (hasR2Config) {
-            const ext = file.originalname?.split('.').pop() || (isVideo ? 'mp4' : 'jpg');
-            const key = `media/${isVideo ? 'videos' : 'images'}/${crypto.randomUUID()}.${ext}`;
+            const key = `media/${isVideo ? 'videos' : 'images'}/${filename}`;
             await r2.send(new PutObjectCommand({
                 Bucket: process.env.CLOUDFLARE_R2_BUCKET_NAME,
                 Key: key,
@@ -434,13 +468,105 @@ app.post('/api/admin/media/upload', auth, admin, upload.single('file'), async (r
                 : key;
             return res.json({ url: publicUrl, filename: file.originalname, mimetype: file.mimetype, size: file.size });
         } else {
-            // Data URL fallback - reliably stores image or short clip
-            const dataUrl = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
-            return res.json({ url: dataUrl, filename: file.originalname, mimetype: file.mimetype, size: file.size });
+            // Save directly to backend/uploads directory on disk and serve via streaming HTTP
+            const targetSubdir = isVideo ? videosDir : imagesDir;
+            const targetPath = path.join(targetSubdir, filename);
+            fs.writeFileSync(targetPath, file.buffer);
+
+            const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+            const host = req.get('host') || `localhost:${port}`;
+            const subfolder = isVideo ? 'videos' : 'images';
+            const publicUrl = `${protocol}://${host}/uploads/${subfolder}/${filename}`;
+            console.log(`✅ Media saved successfully: ${publicUrl} (${Math.round(file.size / 1024)} KB)`);
+            return res.json({ url: publicUrl, filename: file.originalname, mimetype: file.mimetype, size: file.size });
         }
     } catch (err) {
         console.error('Media upload error:', err);
-        return fail(res, 500, 'Failed to process media upload.');
+        return fail(res, 500, 'Failed to process media upload: ' + err.message);
+    }
+});
+
+// Video Samples API (MongoDB Cloud Persistence with Fallback)
+app.get('/api/videos', async (_req, res) => {
+    try {
+        const videos = await database.collection('video_samples').find({}).sort({ created_at: -1 }).toArray();
+        res.json({ videos: videos.map(v => ({ ...v, id: v._id.toString() })) });
+    } catch {
+        res.json({ videos: [] });
+    }
+});
+
+app.post('/api/admin/videos', auth, admin, async (req, res) => {
+    try {
+        const video = { ...req.body, created_at: new Date(), updated_at: new Date() };
+        delete video.id;
+        delete video._id;
+        const result = await database.collection('video_samples').insertOne(video);
+        res.status(201).json({ video: { ...video, id: result.insertedId.toString() } });
+    } catch (err) {
+        fail(res, 500, 'Failed to save video sample');
+    }
+});
+
+app.patch('/api/admin/videos/:id', auth, admin, async (req, res) => {
+    try {
+        const { id: videoId, ...fields } = req.body;
+        fields.updated_at = new Date();
+        await database.collection('video_samples').updateOne({ _id: id(req.params.id) }, { $set: fields });
+        res.json({ ok: true });
+    } catch (err) {
+        fail(res, 500, 'Failed to update video sample');
+    }
+});
+
+app.delete('/api/admin/videos/:id', auth, admin, async (req, res) => {
+    try {
+        await database.collection('video_samples').deleteOne({ _id: id(req.params.id) });
+        res.json({ ok: true });
+    } catch (err) {
+        fail(res, 500, 'Failed to delete video sample');
+    }
+});
+
+// Design Samples API (MongoDB Cloud Persistence with Fallback)
+app.get('/api/designs', async (_req, res) => {
+    try {
+        const designs = await database.collection('design_samples').find({}).sort({ created_at: -1 }).toArray();
+        res.json({ designs: designs.map(d => ({ ...d, id: d._id.toString() })) });
+    } catch {
+        res.json({ designs: [] });
+    }
+});
+
+app.post('/api/admin/designs', auth, admin, async (req, res) => {
+    try {
+        const design = { ...req.body, created_at: new Date(), updated_at: new Date() };
+        delete design.id;
+        delete design._id;
+        const result = await database.collection('design_samples').insertOne(design);
+        res.status(201).json({ design: { ...design, id: result.insertedId.toString() } });
+    } catch (err) {
+        fail(res, 500, 'Failed to save design sample');
+    }
+});
+
+app.patch('/api/admin/designs/:id', auth, admin, async (req, res) => {
+    try {
+        const { id: designId, ...fields } = req.body;
+        fields.updated_at = new Date();
+        await database.collection('design_samples').updateOne({ _id: id(req.params.id) }, { $set: fields });
+        res.json({ ok: true });
+    } catch (err) {
+        fail(res, 500, 'Failed to update design sample');
+    }
+});
+
+app.delete('/api/admin/designs/:id', auth, admin, async (req, res) => {
+    try {
+        await database.collection('design_samples').deleteOne({ _id: id(req.params.id) });
+        res.json({ ok: true });
+    } catch (err) {
+        fail(res, 500, 'Failed to delete design sample');
     }
 });
 

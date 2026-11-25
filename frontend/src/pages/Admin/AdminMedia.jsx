@@ -6,6 +6,11 @@ import {
 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { compressImage } from '../../utils/imageUtils';
+import { 
+    uploadVideoWithProgress, 
+    extractVideoMetadataAndThumbnail, 
+    SafeVideo 
+} from '../../utils/videoStorage';
 import styles from './AdminMedia.module.css';
 
 const AdminMedia = () => {
@@ -24,6 +29,10 @@ const AdminMedia = () => {
     // Video Form State
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [editingVideoId, setEditingVideoId] = useState(null);
+    const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadStatusMsg, setUploadStatusMsg] = useState('');
+    const [uploadFileDetails, setUploadFileDetails] = useState(null);
     const [videoForm, setVideoForm] = useState({
         title: '',
         category: 'Wedding & Teasers',
@@ -127,6 +136,10 @@ const AdminMedia = () => {
             description: '',
             tools: 'Premiere Pro, DaVinci Resolve'
         });
+        setIsUploadingVideo(false);
+        setUploadProgress(0);
+        setUploadStatusMsg('');
+        setUploadFileDetails(null);
         setIsVideoModalOpen(true);
     };
 
@@ -143,11 +156,75 @@ const AdminMedia = () => {
             description: video.description || '',
             tools: Array.isArray(video.tools) ? video.tools.join(', ') : (video.tools || '')
         });
+        setIsUploadingVideo(false);
+        setUploadProgress(0);
+        setUploadStatusMsg('');
+        setUploadFileDetails(null);
         setIsVideoModalOpen(true);
+    };
+
+    const handleVideoFileSelect = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setIsUploadingVideo(true);
+        setUploadProgress(0);
+        setUploadStatusMsg('Analyzing video & extracting frame thumbnail...');
+        const fileSizeMb = (file.size / (1024 * 1024)).toFixed(1);
+        setUploadFileDetails({
+            name: file.name,
+            size: `${fileSizeMb} MB`
+        });
+
+        // 1. Inspect metadata & extract frame thumbnail in background
+        extractVideoMetadataAndThumbnail(file).then((meta) => {
+            setVideoForm(prev => ({
+                ...prev,
+                duration: meta.duration || prev.duration,
+                resolution: meta.resolution || prev.resolution,
+                aspect: meta.aspect || prev.aspect,
+                thumbnail: prev.thumbnail || meta.thumbnail || ''
+            }));
+        }).catch(err => console.warn('Metadata extraction non-fatal warning:', err));
+
+        // 2. Upload video with live progress
+        try {
+            setUploadStatusMsg('Uploading video to media server...');
+            const uploadResult = await uploadVideoWithProgress(file, (percent) => {
+                setUploadProgress(percent);
+                if (percent < 100) {
+                    setUploadStatusMsg(`Uploading video (${percent}%)...`);
+                } else {
+                    setUploadStatusMsg('Processing & finalizing video stream...');
+                }
+            });
+
+            setVideoForm(prev => ({
+                ...prev,
+                videoUrl: uploadResult.url
+            }));
+
+            setUploadStatusMsg(
+                uploadResult.isRemote
+                    ? `Uploaded to media server (${fileSizeMb} MB) • Ready to publish!`
+                    : `Stored in browser Media DB (${fileSizeMb} MB) • Ready to publish!`
+            );
+        } catch (err) {
+            console.error('Video upload error:', err);
+            alert('Failed to upload video: ' + (err.message || 'Unknown error'));
+            setUploadStatusMsg('Upload failed. Please check file format or server status.');
+        } finally {
+            setIsUploadingVideo(false);
+        }
     };
 
     const handleSaveVideo = (e) => {
         e.preventDefault();
+        if (isUploadingVideo) {
+            alert('Please wait for the video upload to complete before saving.');
+            return;
+        }
+
         if (!videoForm.title || !videoForm.videoUrl) {
             alert('Please provide a title and video file or URL.');
             return;
@@ -356,7 +433,7 @@ const AdminMedia = () => {
                             <div key={video.id} className={styles.mediaItemCard}>
                                 <div className={styles.videoPreviewBox}>
                                     {video.videoUrl ? (
-                                        <video 
+                                        <SafeVideo 
                                             src={video.videoUrl} 
                                             poster={video.thumbnail} 
                                             controls 
@@ -808,28 +885,83 @@ const AdminMedia = () => {
 
                             {/* Video Source Upload / URL */}
                             <div className={styles.formGroup}>
-                                <label>Video File (Upload MP4 / WebM or enter URL) *</label>
+                                <label>
+                                    Video File (Upload MP4 / WebM / QuickTime or enter URL) *
+                                    {videoForm.resolution && (
+                                        <span className={styles.autoTagPill}>
+                                            <Sparkles size={11} /> {videoForm.resolution} • {videoForm.duration}
+                                        </span>
+                                    )}
+                                </label>
                                 <div className={styles.uploadRow}>
-                                    <label className={styles.fileUploadBtn}>
-                                        <Upload size={16} /> Choose Video File
+                                    <label className={styles.fileUploadBtn} style={{ opacity: isUploadingVideo ? 0.7 : 1 }}>
+                                        {isUploadingVideo ? (
+                                            <>
+                                                <RefreshCw size={16} className={styles.spinning} /> Uploading...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload size={16} /> Choose Video File
+                                            </>
+                                        )}
                                         <input 
                                             type="file" 
-                                            accept="video/*" 
+                                            accept="video/mp4,video/webm,video/ogg,video/quicktime,video/*" 
                                             hidden 
-                                            onChange={(e) => handleFileToDataURL(e.target.files[0], (url) => setVideoForm({ ...videoForm, videoUrl: url }))}
+                                            disabled={isUploadingVideo}
+                                            onChange={handleVideoFileSelect}
                                         />
                                     </label>
                                     <input 
                                         type="text" 
                                         required 
-                                        placeholder="Paste video file URL (e.g. https://.../video.mp4)"
+                                        placeholder="or paste video URL (e.g. https://.../video.mp4)"
                                         value={videoForm.videoUrl}
+                                        disabled={isUploadingVideo}
                                         onChange={(e) => setVideoForm({ ...videoForm, videoUrl: e.target.value })}
                                     />
                                 </div>
+
+                                {/* Live Upload Progress Bar */}
+                                {isUploadingVideo && (
+                                    <div className={styles.uploadProgressWrapper}>
+                                        <div className={styles.progressHeader}>
+                                            <span>
+                                                <RefreshCw size={13} className={styles.spinning} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                                                {uploadStatusMsg || 'Uploading video to media server...'}
+                                            </span>
+                                            <span className={styles.progressPercent}>{uploadProgress}%</span>
+                                        </div>
+                                        <div className={styles.progressBarOuter}>
+                                            <div 
+                                                className={styles.progressBarInner} 
+                                                style={{ width: `${uploadProgress}%` }} 
+                                            />
+                                        </div>
+                                        {uploadFileDetails && (
+                                            <div style={{ marginTop: '0.4rem', fontSize: '0.75rem', color: '#64748b' }}>
+                                                File: <strong>{uploadFileDetails.name}</strong> ({uploadFileDetails.size})
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Upload Complete Notification */}
+                                {!isUploadingVideo && uploadStatusMsg && videoForm.videoUrl && (
+                                    <div className={`${styles.uploadStatusBadge} ${styles.statusSuccess}`}>
+                                        <CheckCircle size={14} /> {uploadStatusMsg}
+                                    </div>
+                                )}
+
+                                {/* Live Video Player Preview */}
                                 {videoForm.videoUrl && (
                                     <div className={styles.inlineVideoPreview}>
-                                        <video src={videoForm.videoUrl} controls className={styles.inlinePlayer} />
+                                        <SafeVideo 
+                                            src={videoForm.videoUrl} 
+                                            poster={videoForm.thumbnail} 
+                                            controls 
+                                            className={styles.inlinePlayer} 
+                                        />
                                     </div>
                                 )}
                             </div>
@@ -913,8 +1045,16 @@ const AdminMedia = () => {
                                 <button type="button" onClick={() => setIsVideoModalOpen(false)} className={styles.cancelBtn}>
                                     Cancel
                                 </button>
-                                <button type="submit" className={styles.saveSubmitBtn}>
-                                    <Save size={16} /> {editingVideoId ? 'Update Video' : 'Save & Publish Video'}
+                                <button type="submit" className={styles.saveSubmitBtn} disabled={isUploadingVideo}>
+                                    {isUploadingVideo ? (
+                                        <>
+                                            <RefreshCw size={16} className={styles.spinning} /> Uploading Video ({uploadProgress}%)...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save size={16} /> {editingVideoId ? 'Update Video' : 'Save & Publish Video'}
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </form>

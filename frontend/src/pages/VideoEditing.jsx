@@ -6,6 +6,7 @@ import {
     Layers, MonitorPlay, MessageSquare, PhoneCall, Star, X
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
+import { SafeVideo } from '../utils/videoStorage';
 import styles from './VideoEditing.module.css';
 
 const VideoEditing = () => {
@@ -486,7 +487,7 @@ const VideoEditing = () => {
                             </button>
 
                             <div className={styles.videoPlayerWrapper}>
-                                <video
+                                <SafeVideo
                                     src={activeVideoModal.videoUrl}
                                     controls
                                     autoPlay
@@ -495,7 +496,7 @@ const VideoEditing = () => {
                                     poster={activeVideoModal.thumbnail}
                                 >
                                     Your browser does not support HTML5 video preview.
-                                </video>
+                                </SafeVideo>
                             </div>
 
                             <div className={styles.modalMetaInfo}>

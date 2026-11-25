@@ -68,8 +68,27 @@ export const DataProvider = ({ children }) => {
         } catch {
             setCms(db.getCMS());
         }
-        setVideoSamples(db.getVideoSamples());
-        setDesignSamples(db.getDesignSamples());
+        try {
+            const vRes = await api('/videos').catch(() => null);
+            if (vRes && vRes.videos && vRes.videos.length > 0) {
+                setVideoSamples(vRes.videos);
+            } else {
+                setVideoSamples(db.getVideoSamples());
+            }
+        } catch {
+            setVideoSamples(db.getVideoSamples());
+        }
+
+        try {
+            const dRes = await api('/designs').catch(() => null);
+            if (dRes && dRes.designs && dRes.designs.length > 0) {
+                setDesignSamples(dRes.designs);
+            } else {
+                setDesignSamples(db.getDesignSamples());
+            }
+        } catch {
+            setDesignSamples(db.getDesignSamples());
+        }
     };
 
     useEffect(() => {
@@ -216,31 +235,67 @@ export const DataProvider = ({ children }) => {
             },
             videoSamples,
             designSamples,
-            addVideoSample: (video) => {
-                const newVid = db.addVideoSample(video);
-                setVideoSamples(prev => [newVid, ...prev]);
-                return newVid;
+            addVideoSample: async (video) => {
+                try {
+                    const res = await api('/admin/videos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(video)
+                    }).catch(() => null);
+                    const saved = res?.video || video;
+                    const newVid = db.addVideoSample(saved);
+                    setVideoSamples(prev => [newVid, ...prev]);
+                    return newVid;
+                } catch {
+                    const newVid = db.addVideoSample(video);
+                    setVideoSamples(prev => [newVid, ...prev]);
+                    return newVid;
+                }
             },
-            updateVideoSample: (id, fields) => {
+            updateVideoSample: async (id, fields) => {
+                api(`/admin/videos/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(fields)
+                }).catch(() => {});
                 const updated = db.updateVideoSample(id, fields);
                 setVideoSamples(prev => prev.map(v => v.id === id ? { ...v, ...fields } : v));
                 return updated;
             },
-            deleteVideoSample: (id) => {
+            deleteVideoSample: async (id) => {
+                api(`/admin/videos/${id}`, { method: 'DELETE' }).catch(() => {});
                 db.deleteVideoSample(id);
                 setVideoSamples(prev => prev.filter(v => v.id !== id));
             },
-            addDesignSample: (design) => {
-                const newDes = db.addDesignSample(design);
-                setDesignSamples(prev => [newDes, ...prev]);
-                return newDes;
+            addDesignSample: async (design) => {
+                try {
+                    const res = await api('/admin/designs', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(design)
+                    }).catch(() => null);
+                    const saved = res?.design || design;
+                    const newDes = db.addDesignSample(saved);
+                    setDesignSamples(prev => [newDes, ...prev]);
+                    return newDes;
+                } catch {
+                    const newDes = db.addDesignSample(design);
+                    setDesignSamples(prev => [newDes, ...prev]);
+                    return newDes;
+                }
             },
-            updateDesignSample: (id, fields) => {
+            updateDesignSample: async (id, fields) => {
+                api(`/admin/designs/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(fields)
+                }).catch(() => {});
                 const updated = db.updateDesignSample(id, fields);
                 setDesignSamples(prev => prev.map(d => d.id === id ? { ...d, ...fields } : d));
                 return updated;
             },
-            deleteDesignSample: (id) => {
+            deleteDesignSample: async (id) => {
+                api(`/admin/designs/${id}`, { method: 'DELETE' }).catch(() => {});
                 db.deleteDesignSample(id);
                 setDesignSamples(prev => prev.filter(d => d.id !== id));
             }

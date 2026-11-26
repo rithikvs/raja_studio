@@ -96,6 +96,9 @@ export const DataProvider = ({ children }) => {
         refreshData();
 
         const handleDbChange = (e) => {
+            if (e?.detail?.key === 'raja_cms') {
+                return;
+            }
             refreshData();
         };
 
@@ -224,14 +227,24 @@ export const DataProvider = ({ children }) => {
                 db.deleteCoupon(id);
                 setCoupons(prev => prev.filter(c => c.id !== id));
             },
-            saveCMS: (newCms) => {
+            saveCMS: async (newCms) => {
                 setCms(newCms);
-                db.saveCMS(newCms);
-                api('/cms', { 
-                    method: 'PUT', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(newCms) 
-                }).catch(() => {});
+                db.saveCMS(newCms, { skipNotify: true });
+                try {
+                    const res = await api('/cms', { 
+                        method: 'PUT', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify(newCms) 
+                    });
+                    if (res && res.data) {
+                        setCms(res.data);
+                        db.saveCMS(res.data, { skipNotify: true });
+                        return res.data;
+                    }
+                } catch (err) {
+                    console.warn('API saveCMS fallback to local storage:', err);
+                }
+                return newCms;
             },
             videoSamples,
             designSamples,

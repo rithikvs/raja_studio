@@ -317,8 +317,8 @@
 /* Video Grid */
 .videoGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: 1.5rem;
 }
 
 .sampleCard {
@@ -1033,4 +1033,70 @@
 .modalBookBtn:hover {
     background: #FFFFFF;
     color: var(--color-emerald-deep);
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+    .heroSection {
+        padding: 3rem 0 2.5rem;
+    }
+
+    .heroTitle {
+        font-size: clamp(1.8rem, 6vw, 2.3rem);
+    }
+
+    .heroActions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .primaryBtn,
+    .secondaryBtn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .trustStrip {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .trustDivider {
+        display: none;
+    }
+
+    .filterBar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .categoryTabs {
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modalPlayerContainer {
+        border-radius: 14px;
+    }
+
+    .modalMetaInfo {
+        padding: 1.25rem;
+    }
+
+    .modalTitle {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .videoGrid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .sampleInfo {
+        padding: 1rem;
+    }
 }

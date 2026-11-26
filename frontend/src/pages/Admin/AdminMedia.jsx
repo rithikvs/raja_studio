@@ -5,7 +5,7 @@ import {
     Clock, MonitorPlay, Sparkles, Layers, Sliders, ExternalLink
 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
-import { compressImage } from '../../utils/imageUtils';
+import { compressImage, uploadImageFile, uploadBase64Image } from '../../utils/imageUtils';
 import { 
     uploadVideoWithProgress, 
     extractVideoMetadataAndThumbnail, 
@@ -25,6 +25,8 @@ const AdminMedia = () => {
     const [activeTab, setActiveTab] = useState('videos');
     const [searchQuery, setSearchQuery] = useState('');
     const [filterCategory, setFilterCategory] = useState('All');
+    const [isSavingSiteImages, setIsSavingSiteImages] = useState(false);
+    const [uploadingImageField, setUploadingImageField] = useState(null);
 
     // Video Form State
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -90,35 +92,51 @@ const AdminMedia = () => {
         setTimeout(() => setAlertMsg(null), 3500);
     };
 
-    // Helper: File to DataURL with automatic client-side compression for images
-    const handleFileToDataURL = async (file, callback) => {
+    // Helper: Upload image directly to server storage with client-side compression
+    const handleImageUpload = async (file, callback, fieldName = '') => {
         if (!file) return;
-        if (file.type && file.type.startsWith('image/')) {
+        try {
+            if (fieldName) setUploadingImageField(fieldName);
+            showAlert(`Uploading ${fieldName || 'image'} to media server...`);
+            const result = await uploadImageFile(file, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 });
+            callback(result.url);
+            showAlert(`✅ ${fieldName || 'Image'} uploaded successfully!`);
+        } catch (err) {
+            console.error('Image upload failed:', err);
             try {
-                const compressed = await compressImage(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.82 });
+                const compressed = await compressImage(file, { maxWidth: 1000, maxHeight: 1000, quality: 0.8 });
                 callback(compressed);
-                return;
-            } catch (err) {
-                console.warn('Image compression fallback:', err);
+            } catch (compErr) {
+                alert('Failed to process image: ' + err.message);
             }
+        } finally {
+            if (fieldName) setUploadingImageField(null);
         }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            callback(e.target.result);
-        };
-        reader.readAsDataURL(file);
     };
 
+    // Alias for compatibility
+    const handleFileToDataURL = handleImageUpload;
+
     // Helper: Update site image and automatically save so changes are immediately live
-    const updateSiteImage = (field, value, isUpload = false) => {
-        const updated = { ...siteImages, [field]: value };
+    const updateSiteImage = async (field, value, isUpload = false) => {
+        let cleanValue = value;
+        if (value && typeof value === 'string' && value.startsWith('data:image/')) {
+            try {
+                showAlert(`Optimizing ${field.replace('Image', '')}...`);
+                const res = await uploadBase64Image(value);
+                cleanValue = res.url;
+            } catch (convErr) {
+                console.warn('Base64 upload non-fatal warning:', convErr);
+            }
+        }
+        const updated = { ...siteImages, [field]: cleanValue };
         setSiteImages(updated);
         if (isUpload || value === '') {
-            saveCMS({
+            await saveCMS({
                 ...cms,
                 ...updated
             });
-            showAlert(`${field.replace('Image', '')} image updated & published live!`);
+            showAlert(`✅ ${field.replace('Image', '')} image updated & published live!`);
         }
     };
 
@@ -319,13 +337,30 @@ const AdminMedia = () => {
     };
 
     // Site Images Handler
-    const handleSaveSiteImages = (e) => {
+    const handleSaveSiteImages = async (e) => {
         e.preventDefault();
-        saveCMS({
-            ...cms,
-            ...siteImages
-        });
-        showAlert('Website images, brand logo, and banners saved & updated live!');
+        setIsSavingSiteImages(true);
+        try {
+            showAlert('Saving & publishing all website images...');
+            const cleaned = { ...siteImages };
+            for (const key of Object.keys(cleaned)) {
+                if (typeof cleaned[key] === 'string' && cleaned[key].startsWith('data:image/')) {
+                    const res = await uploadBase64Image(cleaned[key]);
+                    cleaned[key] = res.url;
+                }
+            }
+            setSiteImages(cleaned);
+            await saveCMS({
+                ...cms,
+                ...cleaned
+            });
+            showAlert('✅ Website images, brand logo, and banners saved & updated live!');
+        } catch (err) {
+            console.error('Error saving site images:', err);
+            showAlert('⚠️ Error saving images: ' + (err.message || 'Please try again'));
+        } finally {
+            setIsSavingSiteImages(false);
+        }
     };
 
     // Filters
@@ -834,8 +869,14 @@ const AdminMedia = () => {
                         </div>
 
                         <div className={styles.saveBar}>
-                            <button type="submit" className={styles.primarySaveBtn}>
-                                <Save size={18} /> Save & Publish All Website Images
+                            <button 
+                                type="submit" 
+                                className={styles.primarySaveBtn} 
+                                disabled={isSavingSiteImages}
+                                style={{ opacity: isSavingSiteImages ? 0.75 : 1, display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                            >
+                                <Save size={18} className={isSavingSiteImages ? styles.spinning : ''} />
+                                {isSavingSiteImages ? 'Saving & Publishing Images...' : 'Save & Publish All Website Images'}
                             </button>
                         </div>
                     </form>

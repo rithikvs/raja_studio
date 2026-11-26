@@ -42,14 +42,21 @@ const AdminLogin = () => {
         setLoading(false);
     };
 
+    const handleQuickFill = () => {
+        setUsername('admin@123');
+        setPassword('1234');
+        setError('');
+    };
+
     return (
         <div className={styles.loginContainer}>
             <div className={styles.loginCard}>
                 <div className={styles.loginHeader}>
                     <ShieldCheck size={48} className={styles.adminIcon} />
-                    <h1>RAJA STUDIO</h1>
-                    <h2>ADMIN LOGIN</h2>
-                    <p>Administrative Control Panel Access</p>
+                    <span className={styles.boutiqueSub}>LUXURY BOUTIQUE GIFTING</span>
+                    <h1>STUDIO GIFT SHOP</h1>
+                    <h2>ADMINISTRATOR LOGIN</h2>
+                    <p>Exclusive Control Panel Access for Store Owners</p>
                 </div>
 
                 {error && (
@@ -58,9 +65,25 @@ const AdminLogin = () => {
                     </div>
                 )}
 
+                <div className={styles.adminInfoBanner}>
+                    <div className={styles.adminInfoIcon}>👑</div>
+                    <div className={styles.adminInfoText}>
+                        <strong>Default Admin Credentials:</strong>
+                        <span>Username: <code>admin@123</code> &nbsp;|&nbsp; Password: <code>1234</code></span>
+                    </div>
+                    <button 
+                        type="button" 
+                        onClick={handleQuickFill} 
+                        className={styles.quickFillBtn}
+                        title="Click to automatically fill credentials"
+                    >
+                        Auto-Fill
+                    </button>
+                </div>
+
                 <form onSubmit={handleSubmit} className={styles.loginForm}>
                     <div className={styles.inputGroup}>
-                        <label htmlFor="username">Admin Username</label>
+                        <label htmlFor="username">Admin Username or Email</label>
                         <div className={styles.inputWrapper}>
                             <User size={20} className={styles.inputIcon} />
                             <input
@@ -71,6 +94,8 @@ const AdminLogin = () => {
                                 placeholder="admin@123"
                                 required
                                 disabled={loading}
+                                autoCapitalize="none"
+                                autoComplete="username"
                             />
                         </div>
                     </div>
@@ -87,6 +112,7 @@ const AdminLogin = () => {
                                 placeholder="Enter admin password"
                                 required
                                 disabled={loading}
+                                autoComplete="current-password"
                             />
                         </div>
                     </div>
@@ -96,18 +122,16 @@ const AdminLogin = () => {
                         className={styles.loginButton}
                         disabled={loading}
                     >
-                        {loading ? 'Logging in...' : 'Login to Admin Dashboard'}
+                        {loading ? 'Authenticating Admin...' : 'Login to Admin Dashboard'}
                     </button>
                 </form>
-
-                <div className={styles.credentialsHint}><p>Sign in with your administrator account (e.g. admin@gmail.com / admin123).</p></div>
 
                 <div className={styles.backToSite}>
                     <button 
                         onClick={() => navigate('/')} 
                         className={styles.backButton}
                     >
-                        ← Back to Main Website
+                        ← Back to Studio Gift Shop
                     </button>
                 </div>
             </div>

@@ -24,7 +24,7 @@ const Navbar = () => {
     const [searchSuggestionsOpen, setSearchSuggestionsOpen] = useState(false);
     const searchRef = useRef(null);
 
-    const { customerUser, logoutCustomer, setLoginModalOpen } = useAuth();
+    const { customerUser, logoutCustomer, adminUser, logoutAdmin, setLoginModalOpen } = useAuth();
     const { cart, wishlist, subtotal } = useCart();
     const { cms, categories, products } = useData();
     const navigate = useNavigate();
@@ -253,9 +253,23 @@ const Navbar = () => {
 
                     {/* Right Action Icons (Account, Wishlist, Cart) */}
                     <div className={styles.headerActions}>
-                        {/* Account Menu */}
+                        {/* Account Menu (Handles both Admin and Customer) */}
                         <div className={styles.userActionWrapper}>
-                            {customerUser ? (
+                            {adminUser ? (
+                                <button 
+                                    className={`${styles.actionBtn} ${styles.adminActionBtn}`} 
+                                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                                    title="Administrator Control Panel"
+                                >
+                                    <div className={`${styles.actionIconBadge} ${styles.adminIconBadge}`}>
+                                        <ShieldCheck size={22} color="#D4AF37" />
+                                    </div>
+                                    <div className={styles.actionTextCol}>
+                                        <span className={styles.actionSubtext}>Owner</span>
+                                        <span className={styles.actionMaintext}>Admin</span>
+                                    </div>
+                                </button>
+                            ) : customerUser ? (
                                 <button 
                                     className={styles.actionBtn} 
                                     onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -285,40 +299,80 @@ const Navbar = () => {
                                 </button>
                             )}
 
-                            {/* User Account Dropdown */}
+                            {/* User Account / Admin Dropdown */}
                             <AnimatePresence>
-                                {userMenuOpen && customerUser && (
+                                {userMenuOpen && (adminUser || customerUser) && (
                                     <motion.div
                                         className={styles.accountDropdown}
                                         initial={{ opacity: 0, y: 10, scale: 0.96 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 10, scale: 0.96 }}
                                     >
-                                        <div className={styles.dropdownUserBanner}>
-                                            <p className={styles.dropdownUserName}>{customerUser.name || 'Valued Guest'}</p>
-                                            <p className={styles.dropdownUserEmail}>{customerUser.email}</p>
-                                        </div>
-                                        <div className={styles.dropdownMenuLinks}>
-                                            <Link to="/account" onClick={() => setUserMenuOpen(false)} className={styles.dropdownLink}>
-                                                <User size={16} /> My Account Dashboard
-                                            </Link>
-                                            <Link to="/account/orders" onClick={() => setUserMenuOpen(false)} className={styles.dropdownLink}>
-                                                <Package size={16} /> My Order History
-                                            </Link>
-                                            <Link to="/wishlist" onClick={() => setUserMenuOpen(false)} className={styles.dropdownLink}>
-                                                <Heart size={16} /> My Wishlist ({wishlist.length})
-                                            </Link>
-                                            <button 
-                                                onClick={() => { 
-                                                    logoutCustomer(); 
-                                                    setUserMenuOpen(false); 
-                                                    navigate('/'); 
-                                                }} 
-                                                className={styles.dropdownLogoutBtn}
-                                            >
-                                                <LogOut size={16} /> Sign Out
-                                            </button>
-                                        </div>
+                                        {adminUser ? (
+                                            <>
+                                                <div className={styles.dropdownUserBanner} style={{ background: 'linear-gradient(135deg, #0B3D2E, #064E3B)', borderBottom: '1px solid #D4AF37' }}>
+                                                    <p className={styles.dropdownUserName} style={{ color: '#F5C542', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                        <ShieldCheck size={16} /> Administrator
+                                                    </p>
+                                                    <p className={styles.dropdownUserEmail} style={{ color: '#e2e8f0' }}>{adminUser.email}</p>
+                                                </div>
+                                                <div className={styles.dropdownMenuLinks}>
+                                                    <Link to="/admin/dashboard" onClick={() => setUserMenuOpen(false)} className={styles.dropdownLink} style={{ fontWeight: 700, color: '#064E3B' }}>
+                                                        <ShieldCheck size={16} color="#D4AF37" /> Admin Dashboard
+                                                    </Link>
+                                                    <Link to="/admin/products" onClick={() => setUserMenuOpen(false)} className={styles.dropdownLink}>
+                                                        <Package size={16} /> Products Manager
+                                                    </Link>
+                                                    <Link to="/admin/orders" onClick={() => setUserMenuOpen(false)} className={styles.dropdownLink}>
+                                                        <ShoppingBag size={16} /> Orders & Photos
+                                                    </Link>
+                                                    <Link to="/admin/media" onClick={() => setUserMenuOpen(false)} className={styles.dropdownLink}>
+                                                        <Layers size={16} /> Video & Design Media
+                                                    </Link>
+                                                    <Link to="/admin/cms" onClick={() => setUserMenuOpen(false)} className={styles.dropdownLink}>
+                                                        <SlidersHorizontal size={16} /> Website Content & CMS
+                                                    </Link>
+                                                    <button 
+                                                        onClick={() => { 
+                                                            logoutAdmin(); 
+                                                            setUserMenuOpen(false); 
+                                                            navigate('/'); 
+                                                        }} 
+                                                        className={styles.dropdownLogoutBtn}
+                                                    >
+                                                        <LogOut size={16} /> Sign Out Admin
+                                                    </button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className={styles.dropdownUserBanner}>
+                                                    <p className={styles.dropdownUserName}>{customerUser.name || 'Valued Guest'}</p>
+                                                    <p className={styles.dropdownUserEmail}>{customerUser.email}</p>
+                                                </div>
+                                                <div className={styles.dropdownMenuLinks}>
+                                                    <Link to="/account" onClick={() => setUserMenuOpen(false)} className={styles.dropdownLink}>
+                                                        <User size={16} /> My Account Dashboard
+                                                    </Link>
+                                                    <Link to="/account/orders" onClick={() => setUserMenuOpen(false)} className={styles.dropdownLink}>
+                                                        <Package size={16} /> My Order History
+                                                    </Link>
+                                                    <Link to="/wishlist" onClick={() => setUserMenuOpen(false)} className={styles.dropdownLink}>
+                                                        <Heart size={16} /> My Wishlist ({wishlist.length})
+                                                    </Link>
+                                                    <button 
+                                                        onClick={() => { 
+                                                            logoutCustomer(); 
+                                                            setUserMenuOpen(false); 
+                                                            navigate('/'); 
+                                                        }} 
+                                                        className={styles.dropdownLogoutBtn}
+                                                    >
+                                                        <LogOut size={16} /> Sign Out
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -533,9 +587,62 @@ const Navbar = () => {
                                     ))}
                                 </ul>
 
-                                {/* Mobile User Section */}
+                                {/* Mobile User & Admin Section */}
                                 <div className={styles.mobileUserFooter}>
-                                    {customerUser ? (
+                                    {adminUser ? (
+                                        <div className={styles.mobileAdminBanner}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.75rem' }}>
+                                                <div style={{ background: '#F5C542', color: '#064E3B', padding: '6px', borderRadius: '50%', display: 'flex' }}>
+                                                    <ShieldCheck size={20} />
+                                                </div>
+                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <p style={{ margin: 0, fontWeight: 800, fontSize: '0.9rem', color: '#FFFDF5' }}>Store Admin Active</p>
+                                                    <p style={{ margin: 0, fontSize: '0.75rem', color: '#F5C542', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{adminUser.email}</p>
+                                                </div>
+                                            </div>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                                <Link 
+                                                    to="/admin/dashboard" 
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                    className={styles.mobileAdminDashboardBtn}
+                                                >
+                                                    <LayoutDashboard size={15} /> Dashboard
+                                                </Link>
+                                                <Link 
+                                                    to="/admin/products" 
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                    className={styles.mobileAdminSubBtn}
+                                                >
+                                                    <Package size={15} /> Products
+                                                </Link>
+                                                <Link 
+                                                    to="/admin/media" 
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                    className={styles.mobileAdminSubBtn}
+                                                >
+                                                    <Layers size={15} /> Media
+                                                </Link>
+                                                <Link 
+                                                    to="/admin/cms" 
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                    className={styles.mobileAdminSubBtn}
+                                                >
+                                                    <SlidersHorizontal size={15} /> CMS
+                                                </Link>
+                                            </div>
+                                            <button 
+                                                onClick={() => {
+                                                    logoutAdmin();
+                                                    setMobileMenuOpen(false);
+                                                    navigate('/');
+                                                }}
+                                                className={styles.mobileLogoutBtn}
+                                                style={{ color: '#fca5a5' }}
+                                            >
+                                                <LogOut size={16} /> Sign Out Admin
+                                            </button>
+                                        </div>
+                                    ) : customerUser ? (
                                         <div className={styles.mobileLoggedIn}>
                                             <p className={styles.mobileGreeting}>Signed in as <strong>{customerUser.name}</strong></p>
                                             <Link 
@@ -564,15 +671,34 @@ const Navbar = () => {
                                             </button>
                                         </div>
                                     ) : (
-                                        <button 
-                                            onClick={() => {
-                                                setLoginModalOpen(true);
-                                                setMobileMenuOpen(false);
-                                            }}
-                                            className={styles.mobileSignInBtn}
-                                        >
-                                            <User size={18} /> Sign In / Register
-                                        </button>
+                                        <>
+                                            <button 
+                                                onClick={() => {
+                                                    setLoginModalOpen(true);
+                                                    setMobileMenuOpen(false);
+                                                }}
+                                                className={styles.mobileSignInBtn}
+                                            >
+                                                <User size={18} /> Sign In / Register
+                                            </button>
+                                            <div style={{ textAlign: 'center', marginTop: '0.85rem' }}>
+                                                <Link 
+                                                    to="/admin/login" 
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                    style={{ 
+                                                        display: 'inline-flex', 
+                                                        alignItems: 'center', 
+                                                        gap: '6px', 
+                                                        fontSize: '0.8rem', 
+                                                        color: 'var(--color-champagne-gold)', 
+                                                        fontWeight: 700, 
+                                                        textDecoration: 'none' 
+                                                    }}
+                                                >
+                                                    <ShieldCheck size={14} /> Administrator Portal Login →
+                                                </Link>
+                                            </div>
+                                        </>
                                     )}
                                 </div>
                             </div>

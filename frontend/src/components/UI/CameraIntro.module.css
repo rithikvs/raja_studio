@@ -1,0 +1,496 @@
+/* =========================================================
+   STUDIO GIFT SHOP – REALISTIC CAMERA INTRO ANIMATION
+========================================================= */
+
+.introOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999999;
+    background: radial-gradient(circle at center, #0B3D2E 0%, #064E3B 40%, #03231a 80%, #01140e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+    cursor: default;
+    box-sizing: border-box;
+}
+
+/* Subtle cinematic film grain & anamorphic glare */
+.filmGrain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(rgba(212, 175, 55, 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.anamorphicStreak {
+    position: absolute;
+    top: 50%;
+    left: -20%;
+    width: 140%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, rgba(245, 197, 66, 0.15) 30%, rgba(212, 175, 55, 0.7) 50%, rgba(245, 197, 66, 0.15) 70%, transparent 100%);
+    transform: translateY(-50%) rotate(-3deg);
+    filter: blur(1px);
+    pointer-events: none;
+    animation: pulseStreak 3s ease-in-out infinite;
+}
+
+@keyframes pulseStreak {
+    0%, 100% { opacity: 0.3; transform: translateY(-50%) rotate(-3deg) scaleY(1); }
+    50% { opacity: 0.8; transform: translateY(-50%) rotate(-3deg) scaleY(2.2); }
+}
+
+/* =========================================================
+   CAMERA VIEWFINDER HUD (HEADS-UP DISPLAY)
+========================================================= */
+.viewfinderHud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2rem 2.5rem;
+    box-sizing: border-box;
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--color-champagne-gold);
+    z-index: 10;
+}
+
+@media (max-width: 768px) {
+    .viewfinderHud {
+        padding: 1.25rem 1.25rem;
+    }
+}
+
+/* Rule of Thirds Grid */
+.gridOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.gridLineH1, .gridLineH2, .gridLineV1, .gridLineV2 {
+    position: absolute;
+    background: rgba(212, 175, 55, 0.12);
+}
+
+.gridLineH1 { top: 33.33%; left: 0; width: 100%; height: 1px; }
+.gridLineH2 { top: 66.66%; left: 0; width: 100%; height: 1px; }
+.gridLineV1 { left: 33.33%; top: 0; height: 100%; width: 1px; }
+.gridLineV2 { left: 66.66%; top: 0; height: 100%; width: 1px; }
+
+/* Corner Framing Brackets */
+.cornerBrackets {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    right: 2rem;
+    bottom: 2rem;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .cornerBrackets {
+        top: 1rem;
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+    }
+}
+
+.cornerTL, .cornerTR, .cornerBL, .cornerBR {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-color: var(--color-champagne-gold);
+    border-style: solid;
+    opacity: 0.85;
+}
+
+.cornerTL { top: 0; left: 0; border-width: 2.5px 0 0 2.5px; }
+.cornerTR { top: 0; right: 0; border-width: 2.5px 2.5px 0 0; }
+.cornerBL { bottom: 0; left: 0; border-width: 0 0 2.5px 2.5px; }
+.cornerBR { bottom: 0; right: 0; border-width: 0 2.5px 2.5px 0; }
+
+/* Top HUD Bar */
+.hudTopBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+}
+
+.recIndicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ef4444;
+}
+
+.recDot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background-color: #ef4444;
+    box-shadow: 0 0 10px #ef4444;
+    animation: blinkRec 1s ease-in-out infinite;
+}
+
+@keyframes blinkRec {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+}
+
+.hudModelName {
+    color: var(--color-warm-cream);
+    font-size: 0.85rem;
+    text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+@media (max-width: 640px) {
+    .hudModelName {
+        display: none;
+    }
+}
+
+.hudBatteryFormat {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--color-golden-yellow);
+}
+
+/* Center Autofocus Reticle */
+.centerReticle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.afBox {
+    width: 140px;
+    height: 140px;
+    border: 1.5px dashed rgba(245, 197, 66, 0.5);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.afBoxLocked {
+    border-color: #10b981 !important;
+    border-style: solid !important;
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.4), inset 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+.afCrosshair {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    color: var(--color-champagne-gold);
+}
+
+.afLabel {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+    background: rgba(6, 78, 59, 0.85);
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    border: 1px solid var(--color-champagne-gold);
+    color: var(--color-golden-yellow);
+}
+
+.afLabelLocked {
+    color: #10b981 !important;
+    border-color: #10b981 !important;
+    background: rgba(6, 78, 59, 0.95);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+/* Bottom HUD Bar */
+.hudBottomBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    letter-spacing: 1.2px;
+    font-weight: 600;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    padding-top: 0.75rem;
+}
+
+.exposureStats {
+    display: flex;
+    gap: 1.2rem;
+    color: var(--color-warm-cream);
+}
+
+.exposureStats span strong {
+    color: var(--color-golden-yellow);
+}
+
+@media (max-width: 640px) {
+    .exposureStats {
+        font-size: 0.72rem;
+        gap: 0.6rem;
+    }
+}
+
+.brandSignature {
+    font-family: var(--font-heading);
+    letter-spacing: 2px;
+    color: var(--color-champagne-gold);
+    font-size: 0.82rem;
+}
+
+@media (max-width: 768px) {
+    .brandSignature {
+        display: none;
+    }
+}
+
+/* =========================================================
+   OPTICAL CAMERA LENS ASSEMBLY (CENTERPIECE)
+========================================================= */
+.lensAssemblyContainer {
+    position: relative;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+@media (max-width: 480px) {
+    .lensAssemblyContainer {
+        width: 300px;
+        height: 300px;
+    }
+}
+
+/* Outer Machined Metal Bezel */
+.lensBarrelOuter {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #0B3D2E 50%, #064E3B 75%, #03231a 100%);
+    border: 3.5px solid var(--color-champagne-gold);
+    box-shadow: 
+        0 0 60px rgba(6, 78, 59, 0.8),
+        0 0 35px rgba(212, 175, 55, 0.4),
+        inset 0 0 30px rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Golden Engraved Aperture Ring */
+.apertureScaleRing {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    border-radius: 50%;
+    border: 1.5px dashed rgba(212, 175, 55, 0.45);
+    animation: rotateBarrel 24s linear infinite;
+}
+
+@keyframes rotateBarrel {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Inner Lens Glass Element */
+.lensGlassElement {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(20, 90, 66, 0.6) 0%, rgba(6, 78, 59, 0.95) 70%, #021a13 100%);
+    box-shadow: 
+        inset 0 0 40px rgba(0, 0, 0, 0.9),
+        0 0 25px rgba(245, 197, 66, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid rgba(212, 175, 55, 0.6);
+}
+
+/* Glass Reflection Sweep */
+.glassReflection {
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(212, 175, 55, 0.15) 35%, transparent 60%);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: rotate(25deg);
+    animation: glintReflect 4s ease-in-out infinite alternate;
+}
+
+@keyframes glintReflect {
+    0% { transform: rotate(15deg) scale(0.95); opacity: 0.6; }
+    100% { transform: rotate(45deg) scale(1.05); opacity: 0.95; }
+}
+
+/* =========================================================
+   APERTURE BLADES SVG OVERLAY (IRIS MECHANISM)
+========================================================= */
+.apertureSvg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    transform-origin: center center;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =========================================================
+   BRAND EMBLEM IN FOCUS (CENTER)
+========================================================= */
+.brandRevealBox {
+    position: relative;
+    z-index: 8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.luxuryCrestIcon {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-champagne-gold), var(--color-golden-yellow));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-forest-green);
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+    margin-bottom: 0.75rem;
+}
+
+.brandTitle {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin: 0;
+    color: var(--color-warm-cream);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+.brandTitle span {
+    background: linear-gradient(135deg, #F5C542 0%, #D4AF37 50%, #FFFDF5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brandSubtext {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    letter-spacing: 3.5px;
+    color: var(--color-golden-yellow);
+    margin: 0.4rem 0 0 0;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* =========================================================
+   SHUTTER FLASH BURST
+========================================================= */
+.shutterFlash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #FFFDF5 20%, rgba(245, 197, 66, 0.9) 55%, #064E3B 100%);
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* =========================================================
+   CONTROL BUTTONS (SKIP & MUTE)
+========================================================= */
+.controlsRow {
+    position: absolute;
+    bottom: 2rem;
+    right: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    z-index: 50;
+    pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+    .controlsRow {
+        bottom: 1.25rem;
+        right: 1.25rem;
+    }
+}
+
+.audioToggleBtn, .skipBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(6, 78, 59, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--color-champagne-gold);
+    color: var(--color-warm-cream);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.audioToggleBtn:hover, .skipBtn:hover {
+    background: var(--color-champagne-gold);
+    color: var(--color-forest-green);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+.audioToggleBtn {
+    padding: 0.5rem;
+    border-radius: 50%;
+}

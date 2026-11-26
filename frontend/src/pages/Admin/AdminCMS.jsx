@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Save, CheckCircle, RefreshCw, Upload, Film, Palette, Image as ImageIcon, ArrowRight } from 'lucide-react';
 import { useData } from '../../context/DataContext';
-import { compressImage } from '../../utils/imageUtils';
+import { compressImage, uploadImageFile, uploadBase64Image } from '../../utils/imageUtils';
 import styles from './AdminCMS.module.css';
 
 const AdminCMS = () => {
@@ -11,6 +11,8 @@ const AdminCMS = () => {
     const [formData, setFormData] = useState(cms || {});
     const [savedMsg, setSavedMsg] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+    const [uploadingField, setUploadingField] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Keep formData synced whenever CMS context updates
     useEffect(() => {
@@ -33,24 +35,28 @@ const AdminCMS = () => {
 
     const handleFileUpload = async (field, file) => {
         if (!file) return;
+        setUploadingField(field);
         try {
-            const compressed = await compressImage(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.82 });
-            const updated = { ...formData, [field]: compressed };
+            const res = await uploadImageFile(file, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 });
+            const updated = { ...formData, [field]: res.url };
             setFormData(updated);
-            saveCMS(updated); // Instantly auto-save uploaded image
+            await saveCMS(updated);
             setSavedMsg(true);
             setTimeout(() => setSavedMsg(false), 2500);
         } catch (err) {
-            console.error('Error compressing CMS image:', err);
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const updated = { ...formData, [field]: e.target.result };
+            console.error('Error uploading CMS image:', err);
+            try {
+                const compressed = await compressImage(file, { maxWidth: 1000, maxHeight: 1000, quality: 0.8 });
+                const updated = { ...formData, [field]: compressed };
                 setFormData(updated);
-                saveCMS(updated);
+                await saveCMS(updated);
                 setSavedMsg(true);
                 setTimeout(() => setSavedMsg(false), 2500);
-            };
-            reader.readAsDataURL(file);
+            } catch (compErr) {
+                alert('Failed to upload image: ' + err.message);
+            }
+        } finally {
+            setUploadingField(null);
         }
     };
 
@@ -58,11 +64,27 @@ const AdminCMS = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        saveCMS(formData);
-        setSavedMsg(true);
-        setTimeout(() => setSavedMsg(false), 2500);
+        setIsSaving(true);
+        try {
+            const cleaned = { ...formData };
+            for (const key of Object.keys(cleaned)) {
+                if (typeof cleaned[key] === 'string' && cleaned[key].startsWith('data:image/')) {
+                    const res = await uploadBase64Image(cleaned[key]);
+                    cleaned[key] = res.url;
+                }
+            }
+            setFormData(cleaned);
+            await saveCMS(cleaned);
+            setSavedMsg(true);
+            setTimeout(() => setSavedMsg(false), 2500);
+        } catch (err) {
+            console.error('Error saving CMS:', err);
+            alert('Failed to save website content: ' + err.message);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -321,8 +343,14 @@ const AdminCMS = () => {
                 </div>
 
                 <div className={styles.saveRow}>
-                    <button type="submit" className={styles.saveBtn}>
-                        <Save size={18} /> Save & Publish Live Changes
+                    <button 
+                        type="submit" 
+                        className={styles.saveBtn}
+                        disabled={isSaving}
+                        style={{ opacity: isSaving ? 0.75 : 1, display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                    >
+                        <Save size={18} className={isSaving ? styles.spinning : ''} />
+                        {isSaving ? 'Saving & Publishing Changes...' : 'Save & Publish Live Changes'}
                     </button>
                 </div>
             </form>

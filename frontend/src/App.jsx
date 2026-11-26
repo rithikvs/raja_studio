@@ -16,6 +16,7 @@ import WhatsAppFloat from './components/UI/WhatsAppFloat';
 import FloatingBasket from './components/UI/FloatingBasket';
 import BackToTop from './components/UI/BackToTop';
 import LoginModal from './components/UI/LoginModal';
+import CameraIntro from './components/UI/CameraIntro';
 
 // Public & Customer Pages
 import Home from './pages/Home';
@@ -63,8 +64,11 @@ const ScrollToTop = () => {
 
 // Layout wrapper for customer facing pages (includes header & footer)
 const CustomerLayout = () => {
+    const [showIntro, setShowIntro] = React.useState(true);
+
     return (
         <div className="app-container">
+            {showIntro && <CameraIntro onFinish={() => setShowIntro(false)} />}
             <Navbar />
             <WhatsAppFloat />
             <FloatingBasket />

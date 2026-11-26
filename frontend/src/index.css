@@ -9,6 +9,8 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
@@ -17,6 +19,8 @@ body {
   background-color: var(--color-bg-light);
   line-height: 1.6;
   overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -78,11 +82,16 @@ img {
 @media (max-width: 900px) {
   .container {
     max-width: 100vw;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 }
 

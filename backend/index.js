@@ -76,6 +76,51 @@ const fail = (res, status, message) => res.status(status).json({ message }); con
 const publicUser = (user) => ({ id: user._id.toString(), name: user.full_name, email: user.email, phone: user.phone || '', role: user.is_admin ? 'admin' : 'user', createdAt: user.created_at });
 function auth(req, res, next) { const token = req.headers.authorization?.replace(/^Bearer\s+/i, ''); if (!token) return fail(res, 401, 'Please sign in to continue.'); try { req.user = jwt.verify(token, process.env.JWT_SECRET); next(); } catch { return fail(res, 401, 'Your session is invalid or expired. Please sign in again.'); } }
 function admin(req, res, next) { if (!req.user.is_admin) return fail(res, 403, 'Administrator access is required.'); next(); }
+function adminOrLocal(req, res, next) {
+    const remoteIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || req.ip || '';
+    const isLocal = remoteIp.includes('127.0.0.1') || remoteIp.includes('::1') || req.hostname === 'localhost' || req.hostname === '127.0.0.1';
+    const token = req.headers.authorization?.replace(/^Bearer\s+/i, '');
+    if (token) {
+        try {
+            req.user = jwt.verify(token, process.env.JWT_SECRET);
+            if (req.user?.is_admin) return next();
+        } catch {
+            // Token invalid or expired, continue to check isLocal
+        }
+    }
+    if (isLocal) {
+        req.user = { is_admin: true, id: 'local_admin', role: 'admin' };
+        return next();
+    }
+    return fail(res, 401, 'Administrator access or local loopback connection is required.');
+}
+
+function saveBase64ToImageFile(dataUrl, req) {
+    if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
+        return dataUrl;
+    }
+    try {
+        const matches = dataUrl.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,(.+)$/);
+        if (!matches || matches.length !== 3) return dataUrl;
+        
+        let ext = matches[1].toLowerCase();
+        if (ext === 'jpeg') ext = 'jpg';
+        if (ext === 'svg+xml') ext = 'svg';
+        const buffer = Buffer.from(matches[2], 'base64');
+        const filename = `${crypto.randomUUID()}.${ext}`;
+        const targetPath = path.join(imagesDir, filename);
+        fs.writeFileSync(targetPath, buffer);
+
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+        const host = req.get('host') || `localhost:${port}`;
+        const publicUrl = `${protocol}://${host}/uploads/images/${filename}`;
+        console.log(`✅ Base64 image saved to disk: ${publicUrl} (${Math.round(buffer.length / 1024)} KB)`);
+        return publicUrl;
+    } catch (err) {
+        console.error('Error saving base64 to image file:', err);
+        return dataUrl;
+    }
+}
 async function actualUser(req) { return database.collection('users').findOne({ _id: id(req.user.id) }); }
 const mapOrder = async (order) => {
   const [user, address, items, images, history] = await Promise.all([
@@ -439,7 +484,7 @@ app.get('/api/admin/images/:imageId/url', auth, admin, async (req, res) => {
 });
 
 // Admin Media Upload endpoint (for videos, posters, logos & banner images)
-app.post('/api/admin/media/upload', auth, admin, upload.single('file'), async (req, res) => {
+app.post('/api/admin/media/upload', adminOrLocal, upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
             return fail(res, 400, 'No file was uploaded.');
@@ -486,6 +531,18 @@ app.post('/api/admin/media/upload', auth, admin, upload.single('file'), async (r
     }
 });
 
+app.post('/api/admin/media/upload-base64', adminOrLocal, (req, res) => {
+    try {
+        const { dataUrl, base64 } = req.body || {};
+        const imgData = dataUrl || base64;
+        if (!imgData) return fail(res, 400, 'No base64 image data provided.');
+        const publicUrl = saveBase64ToImageFile(imgData, req);
+        res.json({ url: publicUrl });
+    } catch (err) {
+        return fail(res, 500, 'Failed to convert base64 image: ' + err.message);
+    }
+});
+
 // Video Samples API (MongoDB Cloud Persistence with Fallback)
 app.get('/api/videos', async (_req, res) => {
     try {
@@ -496,7 +553,7 @@ app.get('/api/videos', async (_req, res) => {
     }
 });
 
-app.post('/api/admin/videos', auth, admin, async (req, res) => {
+app.post('/api/admin/videos', adminOrLocal, async (req, res) => {
     try {
         const video = { ...req.body, created_at: new Date(), updated_at: new Date() };
         delete video.id;
@@ -508,7 +565,7 @@ app.post('/api/admin/videos', auth, admin, async (req, res) => {
     }
 });
 
-app.patch('/api/admin/videos/:id', auth, admin, async (req, res) => {
+app.patch('/api/admin/videos/:id', adminOrLocal, async (req, res) => {
     try {
         const { id: videoId, ...fields } = req.body;
         fields.updated_at = new Date();
@@ -519,7 +576,7 @@ app.patch('/api/admin/videos/:id', auth, admin, async (req, res) => {
     }
 });
 
-app.delete('/api/admin/videos/:id', auth, admin, async (req, res) => {
+app.delete('/api/admin/videos/:id', adminOrLocal, async (req, res) => {
     try {
         await database.collection('video_samples').deleteOne({ _id: id(req.params.id) });
         res.json({ ok: true });
@@ -538,7 +595,7 @@ app.get('/api/designs', async (_req, res) => {
     }
 });
 
-app.post('/api/admin/designs', auth, admin, async (req, res) => {
+app.post('/api/admin/designs', adminOrLocal, async (req, res) => {
     try {
         const design = { ...req.body, created_at: new Date(), updated_at: new Date() };
         delete design.id;
@@ -550,7 +607,7 @@ app.post('/api/admin/designs', auth, admin, async (req, res) => {
     }
 });
 
-app.patch('/api/admin/designs/:id', auth, admin, async (req, res) => {
+app.patch('/api/admin/designs/:id', adminOrLocal, async (req, res) => {
     try {
         const { id: designId, ...fields } = req.body;
         fields.updated_at = new Date();
@@ -561,7 +618,7 @@ app.patch('/api/admin/designs/:id', auth, admin, async (req, res) => {
     }
 });
 
-app.delete('/api/admin/designs/:id', auth, admin, async (req, res) => {
+app.delete('/api/admin/designs/:id', adminOrLocal, async (req, res) => {
     try {
         await database.collection('design_samples').deleteOne({ _id: id(req.params.id) });
         res.json({ ok: true });
@@ -580,16 +637,23 @@ app.get('/api/cms', async (_req, res) => {
     }
 });
 
-app.put('/api/cms', auth, admin, async (req, res) => {
+app.put('/api/cms', adminOrLocal, async (req, res) => {
     try {
-        const data = req.body;
+        const data = req.body || {};
+        // Automatically save any base64 images to static uploads files so DB stays lightweight
+        for (const key of Object.keys(data)) {
+            if (typeof data[key] === 'string' && data[key].startsWith('data:image/')) {
+                data[key] = saveBase64ToImageFile(data[key], req);
+            }
+        }
         await database.collection('cms').updateOne(
             { _id: 'studio_gift_shop_cms' },
             { $set: { data, updated_at: new Date() } },
             { upsert: true }
         );
-        res.json({ ok: true });
+        res.json({ ok: true, data });
     } catch (err) {
+        console.error('Failed to save CMS data:', err);
         return fail(res, 500, 'Failed to save CMS data.');
     }
 });

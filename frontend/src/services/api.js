@@ -1,9 +1,15 @@
 const getBaseUrl = () => {
-    // If running on localhost or 127.0.0.1, use local backend on port 8787
+    // 1. If running locally on localhost or 127.0.0.1, use local backend on port 8787
     if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
         return 'http://localhost:8787';
     }
-    return (import.meta.env.VITE_API_URL || 'http://localhost:8787').replace(/\/$/, '');
+    // 2. If VITE_API_URL is configured and points to a remote host (not localhost), use it
+    const envUrl = import.meta.env.VITE_API_URL;
+    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+        return envUrl.replace(/\/$/, '');
+    }
+    // 3. Fallback for Vercel production deployment
+    return 'https://raja-studio.onrender.com';
 };
 
 export async function api(path, options = {}) {

@@ -373,3 +373,46 @@
 .securityIcon {
     color: var(--color-champagne-gold);
 }
+
+@media (max-width: 480px) {
+    .backdrop {
+        padding: 0.6rem;
+    }
+
+    .modalContent {
+        padding: 1.6rem 1.15rem;
+        border-radius: 20px;
+        max-height: 94vh;
+    }
+
+    .brandBadge {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        margin-bottom: 0.5rem;
+    }
+
+    .title {
+        font-size: 1.4rem;
+    }
+
+    .subtitle {
+        font-size: 0.8rem;
+    }
+
+    .tabBtn {
+        padding: 0.6rem 0.4rem;
+        font-size: 0.84rem;
+    }
+
+    .inputWrapper input {
+        font-size: 16px; /* Prevents auto-zoom on iOS */
+        padding: 12px 12px 12px 42px;
+    }
+
+    .primaryAuthBtn {
+        padding: 0.9rem;
+        font-size: 0.92rem;
+        min-height: 48px;
+    }
+}

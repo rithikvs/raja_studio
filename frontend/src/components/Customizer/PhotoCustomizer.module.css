@@ -445,3 +445,41 @@
     color: var(--color-text-main);
     line-height: 1.7;
 }
+
+@media (max-width: 480px) {
+    .productDetailsContainer {
+        padding: 0.85rem;
+        border-radius: 14px;
+    }
+
+    .cartActionRow {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .qtyPill {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .addToCartBtn {
+        width: 100%;
+        padding: 0.85rem;
+    }
+
+    .buyNowLargeBtn {
+        padding: 0.9rem;
+    }
+
+    .tabsHeader {
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 0.5rem;
+    }
+
+    .tabBtn {
+        padding: 0.6rem 0.9rem;
+        font-size: 0.95rem;
+    }
+}

@@ -194,14 +194,16 @@ const getStorageItem = (key, fallback) => {
     }
 };
 
-const setStorageItem = (key, data) => {
+const setStorageItem = (key, data, options = {}) => {
     memoryStore[key] = data;
     try {
         localStorage.setItem(key, JSON.stringify(data));
     } catch (e) {
         console.warn(`localStorage write failed for ${key} (quota limit). Preserved in memoryStore:`, e);
     }
-    notifyChange(key, data);
+    if (!options.skipNotify) {
+        notifyChange(key, data);
+    }
 };
 
 const defaultCMS = {
@@ -603,7 +605,7 @@ export const db = {
 
     // CMS
     getCMS: () => getStorageItem(KEYS.CMS, defaultCMS),
-    saveCMS: (cms) => setStorageItem(KEYS.CMS, cms),
+    saveCMS: (cms, options = {}) => setStorageItem(KEYS.CMS, cms, options),
 
     // Video Samples Management
     getVideoSamples: () => getStorageItem(KEYS.VIDEOS, defaultVideoSamples),

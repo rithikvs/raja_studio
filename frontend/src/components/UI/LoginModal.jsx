@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './LoginModal.module.css';
 
 const LoginModal = () => {
-    const { loginModalOpen, setLoginModalOpen, pendingAction, setPendingAction, loginCustomer, registerCustomer } = useAuth();
+    const { loginModalOpen, setLoginModalOpen, pendingAction, setPendingAction, loginCustomer, registerCustomer, loginAdmin } = useAuth();
     const { addToCart } = useCart();
     const navigate = useNavigate();
 
@@ -78,16 +78,48 @@ const LoginModal = () => {
                     setLoading(false);
                     return;
                 }
+                const cleanEmail = (formData.email || '').trim().toLowerCase();
+                // Check if user is signing in with administrator credentials
+                if (cleanEmail === 'admin@123' || cleanEmail === 'admin' || cleanEmail === 'admin@studiogiftshop.com') {
+                    const adminRes = await loginAdmin(formData.email, formData.password);
+                    if (adminRes.success) {
+                        setSuccessMsg('Welcome, Administrator! Redirecting to Control Panel...');
+                        setTimeout(() => {
+                            setLoginModalOpen(false);
+                            navigate('/admin/dashboard');
+                        }, 600);
+                        return;
+                    }
+                }
+
                 const res = await loginCustomer(formData.email, formData.password);
                 if (res.success) {
-                    setSuccessMsg('Welcome back! Login successful.');
-                    setTimeout(() => {
-                        handleSuccessAuth();
-                        if (!pendingAction || pendingAction.type !== 'BUY_NOW') {
-                            navigate('/account');
-                        }
-                    }, 600);
+                    if (res.user?.role === 'admin') {
+                        setSuccessMsg('Welcome, Administrator! Redirecting to Control Panel...');
+                        setTimeout(() => {
+                            setLoginModalOpen(false);
+                            navigate('/admin/dashboard');
+                        }, 600);
+                    } else {
+                        setSuccessMsg('Welcome back! Login successful.');
+                        setTimeout(() => {
+                            handleSuccessAuth();
+                            if (!pendingAction || pendingAction.type !== 'BUY_NOW') {
+                                navigate('/account');
+                            }
+                        }, 600);
+                    }
                 } else {
+                    // Fallback attempt for admin if customer login failed
+                    const adminRes = await loginAdmin(formData.email, formData.password);
+                    if (adminRes.success) {
+                        setSuccessMsg('Welcome, Administrator! Redirecting to Control Panel...');
+                        setTimeout(() => {
+                            setLoginModalOpen(false);
+                            navigate('/admin/dashboard');
+                        }, 600);
+                        return;
+                    }
                     setError(res.message || 'Invalid credentials. Please verify your email & password.');
                 }
             }

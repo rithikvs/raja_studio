@@ -9,8 +9,18 @@ import { fileURLToPath } from 'node:url';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { MongoClient, ObjectId } from 'mongodb';
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import {
+  getR2Config,
+  hasR2Config,
+  getPublicR2Url,
+  extractR2Key,
+  uploadBufferToR2,
+  uploadBase64ToR2,
+  deleteR2Object,
+  getSignedDownloadUrl,
+  getPresignedUploadUrl,
+  R2_FOLDERS
+} from './r2Storage.js';
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -34,7 +44,7 @@ const port = Number(process.env.PORT || 8787);
 const maxUploadBytes = Number(process.env.MAX_UPLOAD_BYTES || 104857600);
 const statuses = ['Pending', 'Confirmed', 'Photo Review', 'Printing', 'Ready', 'Shipped', 'Delivered', 'Cancelled'];
 const client = new MongoClient(process.env.MONGODB_URI || 'mongodb://invalid'); let database;
-const r2 = new S3Client({ region: process.env.CLOUDFLARE_R2_REGION || 'auto', endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`, credentials: { accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID || '', secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY || '' } });
+console.log('Cloudflare R2 Status:', hasR2Config() ? 'Configured & Enabled' : 'Not configured (using local storage fallback)');
 // Safe dynamic CORS configuration
 app.use(cors({
   origin: true,
@@ -206,11 +216,127 @@ app.post('/api/auth/login', async (req, res) => {
 });
 app.get('/api/products', async (_req, res) => { const products = await database.collection('products').find({ is_active: { $ne: false } }).sort({ created_at: -1 }).toArray(); res.json({ products: products.map((p) => ({ ...p, id: p._id.toString(), _id: undefined, image: p.image_url, createdAt: p.created_at })) }); });
 const productDto = (product) => ({ ...product, id: product._id.toString(), _id: undefined, image: product.image || product.image_url || '', image_url: product.image || product.image_url || '', price: Number(product.salePrice ?? product.price ?? 0), createdAt: product.created_at, updatedAt: product.updated_at });
-const productInput = (body) => ({ ...body, name: body.name?.trim(), price: Number(body.salePrice ?? body.price), regularPrice: Number(body.regularPrice ?? body.salePrice ?? body.price), salePrice: Number(body.salePrice ?? body.price), stock: Number(body.stock ?? 0), image_url: body.image || body.image_url || '', is_active: body.status !== 'disabled', status: body.status === 'disabled' ? 'disabled' : 'active', updated_at: new Date() });
+
+async function processProductPayload(body, req) {
+    const rawMain = body.image || body.image_url || '';
+    let mainImageUrl = rawMain;
+
+    // Convert any Base64 main image to Cloudflare R2 (or local fallback)
+    if (rawMain && typeof rawMain === 'string' && rawMain.startsWith('data:image/')) {
+        if (hasR2Config()) {
+            const res = await uploadBase64ToR2({
+                dataUrl: rawMain,
+                folder: R2_FOLDERS.PRODUCTS,
+                isPublic: true
+            });
+            mainImageUrl = res.url;
+        } else {
+            mainImageUrl = saveBase64ToImageFile(rawMain, req);
+        }
+    }
+
+    // Convert any Base64 gallery images to Cloudflare R2 (or local fallback)
+    let cleanGallery = [];
+    if (Array.isArray(body.galleryImages)) {
+        for (const item of body.galleryImages) {
+            if (typeof item === 'string' && item.startsWith('data:image/')) {
+                if (hasR2Config()) {
+                    const res = await uploadBase64ToR2({
+                        dataUrl: item,
+                        folder: R2_FOLDERS.PRODUCTS,
+                        isPublic: true
+                    });
+                    cleanGallery.push(res.url);
+                } else {
+                    cleanGallery.push(saveBase64ToImageFile(item, req));
+                }
+            } else if (item && typeof item === 'string') {
+                cleanGallery.push(item);
+            }
+        }
+    }
+
+    return {
+        ...body,
+        name: body.name?.trim(),
+        price: Number(body.salePrice ?? body.price),
+        regularPrice: Number(body.regularPrice ?? body.salePrice ?? body.price),
+        salePrice: Number(body.salePrice ?? body.price),
+        stock: Number(body.stock ?? 0),
+        image: mainImageUrl,
+        image_url: mainImageUrl,
+        galleryImages: cleanGallery,
+        is_active: body.status !== 'disabled',
+        status: body.status === 'disabled' ? 'disabled' : 'active',
+        updated_at: new Date()
+    };
+}
+
 app.get('/api/admin/products', auth, admin, async (_req, res) => { const products = await database.collection('products').find({}).sort({ created_at: -1 }).toArray(); res.json({ products: products.map(productDto) }); });
-app.post('/api/admin/products', auth, admin, async (req, res) => { const product = productInput(req.body); if (!product.name || !Number.isFinite(product.price) || product.price < 0) return fail(res, 400, 'Product name and a valid sale price are required.'); product.created_at = new Date(); const result = await database.collection('products').insertOne(product); product._id = result.insertedId; res.status(201).json({ product: productDto(product) }); });
-app.patch('/api/admin/products/:productId', auth, admin, async (req, res) => { if (!ObjectId.isValid(req.params.productId)) return fail(res, 400, 'Invalid product.'); const product = productInput(req.body); delete product.created_at; const result = await database.collection('products').findOneAndUpdate({ _id: id(req.params.productId) }, { $set: product }, { returnDocument: 'after' }); if (!result) return fail(res, 404, 'Product not found.'); res.json({ product: productDto(result) }); });
-app.delete('/api/admin/products/:productId', auth, admin, async (req, res) => { if (!ObjectId.isValid(req.params.productId)) return fail(res, 400, 'Invalid product.'); await database.collection('products').deleteOne({ _id: id(req.params.productId) }); res.status(204).end(); });
+
+app.post('/api/admin/products', auth, admin, async (req, res) => { 
+    try {
+        const product = await processProductPayload(req.body, req); 
+        if (!product.name || !Number.isFinite(product.price) || product.price < 0) {
+            return fail(res, 400, 'Product name and a valid sale price are required.');
+        }
+        product.created_at = new Date(); 
+        const result = await database.collection('products').insertOne(product); 
+        product._id = result.insertedId; 
+        res.status(201).json({ product: productDto(product) });
+    } catch (err) {
+        console.error('Failed to create product:', err);
+        return fail(res, 500, 'Failed to create product: ' + err.message);
+    }
+});
+
+app.patch('/api/admin/products/:productId', auth, admin, async (req, res) => { 
+    if (!ObjectId.isValid(req.params.productId)) return fail(res, 400, 'Invalid product.'); 
+    try {
+        const existing = await database.collection('products').findOne({ _id: id(req.params.productId) });
+        if (!existing) return fail(res, 404, 'Product not found.');
+
+        const product = await processProductPayload(req.body, req); 
+        delete product.created_at; 
+
+        // Cleanup replaced R2 images to avoid orphaned files
+        if (hasR2Config()) {
+            const oldImages = [existing.image, existing.image_url, ...(existing.galleryImages || [])].filter(Boolean);
+            const newImages = [product.image, product.image_url, ...(product.galleryImages || [])].filter(Boolean);
+            const replaced = oldImages.filter(oldUrl => !newImages.includes(oldUrl));
+            for (const oldUrl of replaced) {
+                await deleteR2Object(oldUrl);
+            }
+        }
+
+        const result = await database.collection('products').findOneAndUpdate({ _id: id(req.params.productId) }, { $set: product }, { returnDocument: 'after' }); 
+        res.json({ product: productDto(result) });
+    } catch (err) {
+        console.error('Failed to update product:', err);
+        return fail(res, 500, 'Failed to update product: ' + err.message);
+    }
+});
+
+app.delete('/api/admin/products/:productId', auth, admin, async (req, res) => { 
+    if (!ObjectId.isValid(req.params.productId)) return fail(res, 400, 'Invalid product.'); 
+    try {
+        const product = await database.collection('products').findOne({ _id: id(req.params.productId) });
+        if (product) {
+            // Delete R2 images associated with product to prevent orphaned storage
+            if (hasR2Config()) {
+                const imagesToDelete = [product.image, product.image_url, ...(product.galleryImages || [])].filter(Boolean);
+                for (const imgUrl of imagesToDelete) {
+                    await deleteR2Object(imgUrl);
+                }
+            }
+            await database.collection('products').deleteOne({ _id: id(req.params.productId) }); 
+        }
+        res.status(204).end();
+    } catch (err) {
+        console.error('Failed to delete product:', err);
+        return fail(res, 500, 'Failed to delete product: ' + err.message);
+    }
+});
 app.get('/api/me', auth, async (req, res) => { const user = await actualUser(req); if (!user) return fail(res, 401, 'Account not found.'); res.json({ user: publicUser(user) }); });
 app.put('/api/me', auth, async (req, res) => { const fields = { updated_at: new Date() }; if (req.body.full_name) fields.full_name = req.body.full_name; if (req.body.phone) fields.phone = req.body.phone; await database.collection('users').updateOne({ _id: id(req.user.id) }, { $set: fields }); res.json({ ok: true }); });
 app.get('/api/addresses', auth, async (req, res) => { const addresses = await database.collection('addresses').find({ user_id: id(req.user.id) }).sort({ created_at: -1 }).toArray(); res.json({ addresses }); });
@@ -327,28 +453,24 @@ app.post('/api/orders', auth, upload.any(), async (req, res) => {
     const inserted = await database.collection('order_items').insertMany(itemRows); 
     const savedItems = itemRows.map((item, index) => ({ ...item, _id: inserted.insertedIds[index] })); 
     
-    // Handle image uploads (only if R2 is configured AND files are present)
-    const hasR2Config = process.env.CLOUDFLARE_ACCOUNT_ID && 
-                       process.env.CLOUDFLARE_R2_ACCESS_KEY_ID && 
-                       process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY && 
-                       process.env.CLOUDFLARE_R2_BUCKET_NAME;
-    
+    // Handle image uploads
     if (req.files && req.files.length > 0) {
-        if (hasR2Config) {
-            // Upload to R2 storage
+        if (hasR2Config()) {
+            // Upload to Cloudflare R2 storage in customer-uploads/orders/<orderId>/
             const keys = []; 
             try { 
                 for (const file of req.files) { 
                     const item = savedItems[Number(file.fieldname.replace('image_', ''))]; 
                     if (!item) continue; 
                     const ext = file.mimetype === 'image/jpeg' ? 'jpg' : (file.mimetype?.split('/')[1] || 'jpg'); 
-                    const key = `customer/${userId}/orders/${order._id}/${crypto.randomUUID()}.${ext}`; 
-                    await r2.send(new PutObjectCommand({ 
-                        Bucket: process.env.CLOUDFLARE_R2_BUCKET_NAME, 
-                        Key: key, 
-                        Body: file.buffer, 
-                        ContentType: file.mimetype 
-                    })); 
+                    const safeExt = ext.replace(/[^a-z0-9]/gi, '') || 'jpg';
+                    const key = `${R2_FOLDERS.CUSTOMER_UPLOADS}/orders/${order._id}/${crypto.randomUUID()}.${safeExt}`; 
+                    await uploadBufferToR2({
+                        buffer: file.buffer,
+                        key,
+                        contentType: file.mimetype,
+                        isPublic: false
+                    });
                     keys.push(key); 
                     await database.collection('order_images').insertOne({ 
                         order_id: order._id, 
@@ -363,19 +485,15 @@ app.post('/api/orders', auth, upload.any(), async (req, res) => {
                 } 
             } catch (uploadError) { 
                 console.error('Image upload to R2 failed:', uploadError);
-                // Clean up uploaded files
-                await Promise.all(keys.map((Key) => r2.send(new DeleteObjectCommand({ 
-                    Bucket: process.env.CLOUDFLARE_R2_BUCKET_NAME, 
-                    Key 
-                })).catch(() => null))); 
+                // Clean up uploaded files in R2
+                await Promise.all(keys.map((k) => deleteR2Object(k).catch(() => null))); 
                 // Clean up order
                 await database.collection('orders').deleteOne({ _id: order._id }); 
                 await database.collection('order_items').deleteMany({ order_id: order._id }); 
-                // Don't delete address - it might be reused
                 return fail(res, 502, 'Photo upload failed; no order was placed. Please try again.'); 
             }
         } else {
-            // Store images as base64 in MongoDB (fallback when R2 is not configured)
+            // Temporary fallback when R2 is not configured
             console.log('R2 not configured, storing images in MongoDB');
             for (const file of req.files) {
                 const item = savedItems[Number(file.fieldname.replace('image_', ''))];
@@ -458,20 +576,16 @@ app.get('/api/admin/images/:imageId/url', auth, admin, async (req, res) => {
         
         // Check if image is stored in R2 or MongoDB
         if (image.r2_object_key) {
-            // R2 storage - generate signed URL
+            // R2 storage - generate secure temporary signed URL (private customer asset)
             try {
-                const url = await getSignedUrl(r2, new GetObjectCommand({ 
-                    Bucket: process.env.CLOUDFLARE_R2_BUCKET_NAME, 
-                    Key: image.r2_object_key, 
-                    ResponseContentDisposition: `attachment; filename="${image.original_file_name.replace(/[\r\n"]/g, '')}"` 
-                }), { expiresIn: 300 }); 
-                res.json({ url, expiresIn: 300 });
+                const signed = await getSignedDownloadUrl(image.r2_object_key, image.original_file_name, 300);
+                res.json({ url: signed.url, expiresIn: 300 });
             } catch (error) {
                 console.error('R2 signed URL error:', error);
                 return fail(res, 502, 'Failed to generate download URL');
             }
         } else if (image.image_data) {
-            // MongoDB storage - return base64 data URL
+            // Legacy MongoDB storage - return base64 data URL
             const dataUrl = `data:${image.mime_type};base64,${image.image_data}`;
             res.json({ url: dataUrl, expiresIn: null, format: 'base64' });
         } else {
@@ -483,7 +597,28 @@ app.get('/api/admin/images/:imageId/url', auth, admin, async (req, res) => {
     }
 });
 
-// Admin Media Upload endpoint (for videos, posters, logos & banner images)
+// Presigned Direct Upload URL endpoint (for Vercel & large file browser-to-R2 uploads)
+app.post('/api/admin/uploads/presigned-url', adminOrLocal, async (req, res) => {
+    try {
+        if (!hasR2Config()) {
+            return fail(res, 503, 'Cloudflare R2 is not configured.');
+        }
+        const { folder = R2_FOLDERS.PRODUCTS, originalName = 'upload.jpg', contentType = 'image/jpeg' } = req.body || {};
+        const safeFolder = Object.values(R2_FOLDERS).includes(folder) ? folder : R2_FOLDERS.PRODUCTS;
+        const result = await getPresignedUploadUrl({
+            folder: safeFolder,
+            originalName,
+            contentType,
+            expiresIn: 600
+        });
+        res.json(result);
+    } catch (err) {
+        console.error('Presigned upload URL generation error:', err);
+        return fail(res, 500, 'Failed to generate upload URL: ' + err.message);
+    }
+});
+
+// Admin Media Upload endpoint (for products, videos, posters, logos, & banners)
 app.post('/api/admin/media/upload', adminOrLocal, upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
@@ -491,27 +626,33 @@ app.post('/api/admin/media/upload', adminOrLocal, upload.single('file'), async (
         }
         const file = req.file;
         const isVideo = file.mimetype?.startsWith('video/');
-        const hasR2Config = process.env.CLOUDFLARE_ACCOUNT_ID && 
-                           process.env.CLOUDFLARE_R2_ACCESS_KEY_ID && 
-                           process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY && 
-                           process.env.CLOUDFLARE_R2_BUCKET_NAME;
+        const reqFolder = (req.body?.folder || req.query?.folder || '').toLowerCase().trim();
+        
+        let targetFolder = reqFolder || (isVideo ? 'videos' : R2_FOLDERS.PRODUCTS);
+        if (!Object.values(R2_FOLDERS).includes(targetFolder) && targetFolder !== 'videos' && targetFolder !== 'media') {
+            targetFolder = isVideo ? 'videos' : R2_FOLDERS.PRODUCTS;
+        }
 
         const rawExt = file.originalname?.split('.').pop() || '';
         const ext = rawExt ? rawExt.toLowerCase() : (isVideo ? 'mp4' : 'jpg');
         const filename = `${crypto.randomUUID()}.${ext}`;
 
-        if (hasR2Config) {
-            const key = `media/${isVideo ? 'videos' : 'images'}/${filename}`;
-            await r2.send(new PutObjectCommand({
-                Bucket: process.env.CLOUDFLARE_R2_BUCKET_NAME,
-                Key: key,
-                Body: file.buffer,
-                ContentType: file.mimetype
-            }));
-            const publicUrl = process.env.CLOUDFLARE_R2_PUBLIC_URL 
-                ? `${process.env.CLOUDFLARE_R2_PUBLIC_URL}/${key}`
-                : key;
-            return res.json({ url: publicUrl, filename: file.originalname, mimetype: file.mimetype, size: file.size });
+        if (hasR2Config()) {
+            const key = `${targetFolder}/${filename}`;
+            const result = await uploadBufferToR2({
+                buffer: file.buffer,
+                key,
+                contentType: file.mimetype,
+                isPublic: targetFolder !== R2_FOLDERS.CUSTOMER_UPLOADS
+            });
+            return res.json({ 
+                url: result.url || result.key, 
+                key: result.key, 
+                filename: file.originalname, 
+                mimetype: file.mimetype, 
+                size: file.size, 
+                isRemote: true 
+            });
         } else {
             // Save directly to backend/uploads directory on disk and serve via streaming HTTP
             const targetSubdir = isVideo ? videosDir : imagesDir;
@@ -523,7 +664,7 @@ app.post('/api/admin/media/upload', adminOrLocal, upload.single('file'), async (
             const subfolder = isVideo ? 'videos' : 'images';
             const publicUrl = `${protocol}://${host}/uploads/${subfolder}/${filename}`;
             console.log(`✅ Media saved successfully: ${publicUrl} (${Math.round(file.size / 1024)} KB)`);
-            return res.json({ url: publicUrl, filename: file.originalname, mimetype: file.mimetype, size: file.size });
+            return res.json({ url: publicUrl, filename: file.originalname, mimetype: file.mimetype, size: file.size, isRemote: false });
         }
     } catch (err) {
         console.error('Media upload error:', err);
@@ -531,13 +672,24 @@ app.post('/api/admin/media/upload', adminOrLocal, upload.single('file'), async (
     }
 });
 
-app.post('/api/admin/media/upload-base64', adminOrLocal, (req, res) => {
+app.post('/api/admin/media/upload-base64', adminOrLocal, async (req, res) => {
     try {
-        const { dataUrl, base64 } = req.body || {};
+        const { dataUrl, base64, folder = R2_FOLDERS.WEBSITE_ASSETS } = req.body || {};
         const imgData = dataUrl || base64;
         if (!imgData) return fail(res, 400, 'No base64 image data provided.');
-        const publicUrl = saveBase64ToImageFile(imgData, req);
-        res.json({ url: publicUrl });
+
+        if (hasR2Config()) {
+            const safeFolder = Object.values(R2_FOLDERS).includes(folder) ? folder : R2_FOLDERS.WEBSITE_ASSETS;
+            const result = await uploadBase64ToR2({
+                dataUrl: imgData,
+                folder: safeFolder,
+                isPublic: true
+            });
+            return res.json({ url: result.url, key: result.key, isRemote: true });
+        } else {
+            const publicUrl = saveBase64ToImageFile(imgData, req);
+            res.json({ url: publicUrl, isRemote: false });
+        }
     } catch (err) {
         return fail(res, 500, 'Failed to convert base64 image: ' + err.message);
     }

@@ -128,6 +128,8 @@ export const compressImage = (file, options = {}) => {
 export async function uploadImageFile(file, options = {}) {
     if (!file) throw new Error('No file provided for upload.');
 
+    const folder = options.folder || 'products';
+
     // 1. Compress image to clean web dimensions
     let uploadBlob = file;
     try {
@@ -144,6 +146,7 @@ export async function uploadImageFile(file, options = {}) {
     const formData = new FormData();
     const filename = file.name || `image_${Date.now()}.jpg`;
     formData.append('file', uploadBlob, filename);
+    formData.append('folder', folder);
 
     const token = typeof localStorage !== 'undefined' ? localStorage.getItem('raja_access_token') : null;
     const targetUrl = `${getApiBaseUrl()}/api/admin/media/upload`;
@@ -185,7 +188,7 @@ export async function uploadImageFile(file, options = {}) {
  * Upload an existing base64 string or dataURL to backend media storage
  * Returns the clean static URL.
  */
-export async function uploadBase64Image(dataUrl) {
+export async function uploadBase64Image(dataUrl, folder = 'website-assets') {
     if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
         return { url: dataUrl, isRemote: false };
     }
@@ -199,7 +202,7 @@ export async function uploadBase64Image(dataUrl) {
         const res = await fetch(targetUrl, {
             method: 'POST',
             headers,
-            body: JSON.stringify({ dataUrl })
+            body: JSON.stringify({ dataUrl, folder })
         });
 
         if (res.ok) {
@@ -215,7 +218,7 @@ export async function uploadBase64Image(dataUrl) {
     // Secondary attempt: Convert to Blob and upload via FormData
     try {
         const blob = dataURLToBlob(dataUrl);
-        return await uploadImageFile(blob);
+        return await uploadImageFile(blob, { folder });
     } catch (fallbackErr) {
         console.warn('Fallback base64 conversion failed:', fallbackErr);
         return { url: dataUrl, isRemote: false };

@@ -4,7 +4,7 @@ import { Plus, Edit, Trash2, Copy, Search, Upload, Sliders, Image as ImageIcon, 
 import { useData } from '../../context/DataContext';
 import { useAdmin } from '../../context/AdminContext';
 import { getProductDisplayPrice } from '../../utils/productUtils';
-import { compressImage } from '../../utils/imageUtils';
+import { compressImage, uploadImageFile } from '../../utils/imageUtils';
 import styles from './AdminProducts.module.css';
 
 const AdminProducts = () => {
@@ -130,40 +130,45 @@ const AdminProducts = () => {
         setIsFormOpen(true);
     };
 
+    const [isUploadingMainImage, setIsUploadingMainImage] = useState(false);
+    const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+
     const handleMainImageUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
+        setIsUploadingMainImage(true);
         try {
-            const compressed = await compressImage(file, { maxWidth: 800, maxHeight: 800, quality: 0.82 });
-            setFormData(prev => ({ ...prev, image: compressed }));
+            const res = await uploadImageFile(file, { folder: 'products', maxWidth: 1000, maxHeight: 1000, quality: 0.85 });
+            setFormData(prev => ({ ...prev, image: res.url, image_url: res.url }));
         } catch (err) {
-            console.error('Product image compression failed:', err);
-            const reader = new FileReader();
-            reader.onload = (evt) => setFormData(prev => ({ ...prev, image: evt.target.result }));
-            reader.readAsDataURL(file);
+            console.error('Product image upload failed:', err);
+            try {
+                const compressed = await compressImage(file, { maxWidth: 800, maxHeight: 800, quality: 0.82 });
+                setFormData(prev => ({ ...prev, image: compressed, image_url: compressed }));
+            } catch {
+                alert('Could not process image file.');
+            }
+        } finally {
+            setIsUploadingMainImage(false);
         }
     };
 
     const handleGalleryUpload = async (e) => {
         const files = Array.from(e.target.files);
-        for (const file of files) {
-            try {
-                const compressed = await compressImage(file, { maxWidth: 600, maxHeight: 600, quality: 0.75 });
+        if (!files.length) return;
+        setIsUploadingGallery(true);
+        try {
+            for (const file of files) {
+                const res = await uploadImageFile(file, { folder: 'products', maxWidth: 800, maxHeight: 800, quality: 0.80 });
                 setFormData(prev => ({
                     ...prev,
-                    galleryImages: [...prev.galleryImages, compressed]
+                    galleryImages: [...(prev.galleryImages || []), res.url]
                 }));
-            } catch (err) {
-                console.error('Gallery image compression failed:', err);
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    setFormData(prev => ({
-                        ...prev,
-                        galleryImages: [...prev.galleryImages, evt.target.result]
-                    }));
-                };
-                reader.readAsDataURL(file);
             }
+        } catch (err) {
+            console.error('Gallery image upload failed:', err);
+        } finally {
+            setIsUploadingGallery(false);
         }
     };
 
@@ -507,9 +512,13 @@ const AdminProducts = () => {
                                 <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
                                     <label>Main Product Image</label>
                                     <div className={styles.imageUploadRow}>
-                                        <input type="file" accept="image/*" onChange={handleMainImageUpload} id="product-main-img" hidden />
-                                        <label htmlFor="product-main-img" className={styles.uploadLabel}>
-                                            <Upload size={16} /> Choose Main Image File
+                                        <input type="file" accept="image/*" onChange={handleMainImageUpload} id="product-main-img" hidden disabled={isUploadingMainImage} />
+                                        <label htmlFor="product-main-img" className={styles.uploadLabel} style={{ opacity: isUploadingMainImage ? 0.7 : 1 }}>
+                                            {isUploadingMainImage ? (
+                                                <><RefreshCw size={16} className={styles.spinning} /> Uploading Image...</>
+                                            ) : (
+                                                <><Upload size={16} /> Choose Main Image File</>
+                                            )}
                                         </label>
                                         {formData.image && <img src={formData.image} alt="Preview" className={styles.imgPreview} />}
                                     </div>
@@ -519,9 +528,13 @@ const AdminProducts = () => {
                                 <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
                                     <label>Gallery & Variation Images</label>
                                     <div className={styles.imageUploadRow}>
-                                        <input type="file" accept="image/*" multiple onChange={handleGalleryUpload} id="product-gallery-imgs" hidden />
-                                        <label htmlFor="product-gallery-imgs" className={styles.uploadLabel}>
-                                            <Upload size={16} /> Upload Gallery Images
+                                        <input type="file" accept="image/*" multiple onChange={handleGalleryUpload} id="product-gallery-imgs" hidden disabled={isUploadingGallery} />
+                                        <label htmlFor="product-gallery-imgs" className={styles.uploadLabel} style={{ opacity: isUploadingGallery ? 0.7 : 1 }}>
+                                            {isUploadingGallery ? (
+                                                <><RefreshCw size={16} className={styles.spinning} /> Uploading Gallery Images...</>
+                                            ) : (
+                                                <><Upload size={16} /> Upload Gallery Images</>
+                                            )}
                                         </label>
                                     </div>
                                     {formData.galleryImages.length > 0 && (

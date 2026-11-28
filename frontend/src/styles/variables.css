@@ -1,48 +1,66 @@
 :root {
-    /* STRICT BRAND IDENTITY – GREEN AND GOLD PALETTE */
-    --color-emerald-deep: #064E3B;
-    --color-forest-green: #0B3D2E;
+    /* ==========================================================================
+       RAJA STUDIOS / STUDIO GIFT SHOP — LUXURY BRAND IDENTITY DESIGN SYSTEM
+       Strict Core Palette: Emerald Green, Champagne Gold & Warm Ivory
+       ========================================================================== */
+
+    /* Core Palette Tokens */
+    --color-emerald-deep: #064A3B;
+    --color-emerald-rich: #064E3B;
+    --color-forest-green: #0B3029;
+    --color-forest-dark: #07221D;
     --color-luxury-green: #145A42;
-    --color-golden-yellow: #F5C542;
-    --color-champagne-gold: #D4AF37;
+    --color-emerald-mist: rgba(6, 74, 59, 0.08);
+
+    --color-champagne-gold: #D9AF45;
+    --color-gold-light: #F5D77F;
+    --color-gold-hover: #C99E35;
+    --color-gold-glow: rgba(217, 175, 69, 0.28);
+    --color-gold-subtle: rgba(217, 175, 69, 0.12);
+
+    --color-warm-ivory: #FAF7EF;
     --color-warm-cream: #FFFDF5;
+    --color-cream-soft: #F5EFE0;
+    --color-pure-white: #FFFFFF;
 
     /* Semantic Theme Aliases */
-    --color-primary: #064E3B;
-    --color-primary-dark: #0B3D2E;
+    --color-primary: #064A3B;
+    --color-primary-dark: #0B3029;
     --color-primary-light: #145A42;
-    --color-accent-gold: #D4AF37;
-    --color-accent-yellow: #F5C542;
-    --color-gold-hover: #E5B82A;
+    --color-accent-gold: #D9AF45;
+    --color-gold-accent: #D9AF45;
 
-    --color-header-bg: #064E3B;
-    --color-footer-bg: #0B3D2E;
-    --color-bg-light: #FFFDF5;
-    --color-bg-warm: #FAF6EB;
+    --color-header-bg: #064A3B;
+    --color-footer-bg: #0B3029;
+    --color-bg-light: #FAF7EF;
+    --color-bg-warm: #FFFDF5;
     --color-surface: #FFFFFF;
     --color-white: #FFFFFF;
 
-    /* Borders */
-    --color-border: rgba(212, 175, 55, 0.28);
-    --color-border-subtle: rgba(212, 175, 55, 0.16);
-    --color-border-gold: #D4AF37;
-    --color-border-light: #EFE7DA;
+    /* Borders & Dividers */
+    --color-border: rgba(217, 175, 69, 0.22);
+    --color-border-subtle: rgba(217, 175, 69, 0.12);
+    --color-border-gold: #D9AF45;
+    --color-border-light: rgba(6, 74, 59, 0.08);
 
     /* Text Colors */
-    --color-text-dark: #0B1C15;
+    --color-heading: #103C32;
+    --color-text-dark: #103C32;
     --color-text-main: #1C2E26;
-    --color-text-muted: #5E7267;
-    --color-text-light: #FFFDF5;
-    --color-text-gold: #D4AF37;
+    --color-text-muted: #66756C;
+    --color-text-light: #FAF7EF;
+    --color-text-gold: #D9AF45;
     --color-price-regular: #94A3B8;
-    --color-price-sale: #064E3B;
+    --color-price-sale: #064A3B;
 
     /* Luxury Gradients */
-    --gradient-emerald-gold: linear-gradient(135deg, #064E3B 0%, #145A42 55%, #D4AF37 100%);
-    --gradient-emerald-dark: linear-gradient(180deg, #064E3B 0%, #0B3D2E 100%);
-    --gradient-gold: linear-gradient(135deg, #F5C542 0%, #D4AF37 100%);
-    --gradient-gold-reverse: linear-gradient(135deg, #D4AF37 0%, #F5C542 100%);
-    --gradient-card-cream: linear-gradient(180deg, #FFFFFF 0%, #FFFDF5 100%);
+    --gradient-emerald-gold: linear-gradient(135deg, #064A3B 0%, #145A42 52%, #D9AF45 100%);
+    --gradient-emerald-dark: linear-gradient(180deg, #064A3B 0%, #0B3029 100%);
+    --gradient-gold: linear-gradient(135deg, #F5D77F 0%, #D9AF45 60%, #C99E35 100%);
+    --gradient-gold-reverse: linear-gradient(135deg, #C99E35 0%, #D9AF45 60%, #F5D77F 100%);
+    --gradient-card-cream: linear-gradient(180deg, #FFFFFF 0%, #FAF7EF 100%);
+    --gradient-glass-emerald: linear-gradient(135deg, rgba(6, 74, 59, 0.92) 0%, rgba(11, 48, 41, 0.95) 100%);
+    --gradient-shimmer-gold: linear-gradient(90deg, rgba(217, 175, 69, 0) 0%, rgba(217, 175, 69, 0.4) 50%, rgba(217, 175, 69, 0) 100%);
 
     /* Fonts */
     --font-heading: 'Playfair Display', 'Quicksand', Georgia, serif;
@@ -56,17 +74,22 @@
     --spacing-lg: 3rem;
     --spacing-xl: 5rem;
 
-    /* Transitions */
+    /* Cinematic Physics Timing & Easings */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out-luxury: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-spring-gentle: cubic-bezier(0.34, 1.56, 0.64, 1);
     --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     --transition-medium: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    --transition-smooth: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-smooth: 0.55s cubic-bezier(0.16, 1, 0.3, 1);
 
-    /* Shadows & Radius */
-    --shadow-sm: 0 2px 10px rgba(6, 78, 59, 0.05);
-    --shadow-md: 0 8px 24px rgba(6, 78, 59, 0.09);
-    --shadow-lg: 0 16px 40px rgba(6, 78, 59, 0.14);
-    --shadow-gold: 0 6px 20px rgba(212, 175, 55, 0.3);
-    --shadow-emerald: 0 8px 25px rgba(6, 78, 59, 0.25);
+    /* Shadows & 3D Depth */
+    --shadow-sm: 0 2px 10px rgba(6, 74, 59, 0.05);
+    --shadow-md: 0 8px 24px rgba(6, 74, 59, 0.08);
+    --shadow-lg: 0 16px 40px rgba(6, 74, 59, 0.12);
+    --shadow-3d: 0 20px 48px -10px rgba(6, 74, 59, 0.18), 0 0 1px 1px rgba(217, 175, 69, 0.2);
+    --shadow-gold: 0 8px 25px rgba(217, 175, 69, 0.25);
+    --shadow-emerald: 0 12px 30px rgba(6, 74, 59, 0.28);
+    
     --border-radius-sm: 8px;
     --border-radius-card: 16px;
     --border-radius-btn: 50px;

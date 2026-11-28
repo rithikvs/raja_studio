@@ -1,0 +1,244 @@
+/* Raja Studios — Camera Shutter Intro Animation with Mild Flash & Reveal */
+
+#raja-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(ellipse at 50% 42%, #232016, #0c0c0b 68%);
+  color: #fbf4e5;
+  cursor: pointer;
+  overflow: hidden;
+  transition: opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.38s ease;
+}
+
+#raja-intro.rs-exiting {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#raja-intro .rs-stage {
+  display: grid;
+  justify-items: center;
+  gap: 28px;
+  padding: 24px;
+  animation: rs-enter 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+#raja-intro.rs-exiting .rs-stage {
+  transform: scale(1.04);
+  opacity: 0;
+}
+
+#raja-intro .rs-camera {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(140px, 43vw, 196px);
+  aspect-ratio: 1.45;
+  border: 1px solid #79654b;
+  border-radius: 18px;
+  background: linear-gradient(168deg, #363128, #181715 50%, #101010);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.67), inset 0 1px rgba(234, 211, 163, 0.29);
+  transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+/* Mechanical camera recoil on shutter click */
+#raja-intro .rs-camera.rs-snap {
+  animation: rs-recoil 0.24s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@keyframes rs-recoil {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(0.955) translateY(2px);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Top Viewfinder Bump */
+#raja-intro .rs-camera::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 14%;
+  width: 27%;
+  height: 12px;
+  border: 1px solid #79654b;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background: #29251e;
+}
+
+/* Flash / Sensor LED */
+#raja-intro .rs-camera::after {
+  content: "";
+  position: absolute;
+  top: 13px;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #eac481;
+  box-shadow: 0 0 12px rgba(234, 196, 129, 0.67);
+  transition: all 0.1s ease;
+}
+
+#raja-intro .rs-camera.rs-snap::after {
+  background: #ffffff;
+  box-shadow: 0 0 18px 6px rgba(255, 255, 255, 0.95), 0 0 32px 10px rgba(234, 196, 129, 0.8);
+}
+
+/* Lens Element */
+#raja-intro .rs-lens {
+  display: grid;
+  place-items: center;
+  width: 57%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid #897255;
+  background: radial-gradient(circle at 35% 35%, #2a251d, #0b0a09 72%);
+  box-shadow: 0 0 0 7px #121110, 0 0 0 8px #735f47;
+  animation: rs-focus 0.75s cubic-bezier(0.25, 0.9, 0.3, 1) 0.1s both;
+}
+
+/* Iris Mechanism */
+#raja-intro .rs-iris {
+  position: relative;
+  width: 68%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #090908;
+  box-shadow: inset 0 0 12px #000;
+}
+
+/* Blades */
+#raja-intro .rs-blade {
+  position: absolute;
+  inset: 0;
+  transform: rotate(var(--turn));
+}
+
+#raja-intro .rs-blade::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 90%;
+  height: 62%;
+  background: linear-gradient(145deg, #443c31, #1a1713);
+  clip-path: polygon(0 0, 100% 0, 48% 100%);
+  transform-origin: 50% 100%;
+  transform: translateY(-22%);
+  transition: transform 0.15s ease;
+}
+
+/* Shutter blades closing during the click */
+#raja-intro.rs-clicked .rs-blade::before {
+  animation: rs-shutter-snap 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+@keyframes rs-shutter-snap {
+  0% {
+    transform: translateY(-22%);
+  }
+  45% {
+    transform: translateY(2%);
+  }
+  100% {
+    transform: translateY(-22%);
+  }
+}
+
+/* Brand Title */
+#raja-intro .rs-name {
+  font: 600 clamp(24px, 5.5vw, 42px) / 1.15 Georgia, serif;
+  letter-spacing: .16em;
+  text-align: center;
+  animation: rs-title 0.5s ease 0.25s both;
+}
+
+#raja-intro .rs-name span {
+  color: #e2bb7e;
+}
+
+/* MILD FLASH OVERLAY */
+#raja-intro .rs-mild-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2147483648;
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 250, 240, 0.72) 30%,
+    rgba(234, 211, 163, 0.35) 60%,
+    rgba(6, 74, 59, 0.12) 85%,
+    transparent 100%
+  );
+  animation: rs-flash-dissolve 0.55s ease-out forwards;
+}
+
+@keyframes rs-flash-dissolve {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+/* Standard Entrance Keyframes */
+@keyframes rs-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.93);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rs-focus {
+  from {
+    transform: rotate(-35deg);
+  }
+  to {
+    transform: rotate(18deg);
+  }
+}
+
+@keyframes rs-title {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #raja-intro {
+    transition: opacity 0.2s linear;
+  }
+  #raja-intro *, #raja-intro *::before {
+    animation: none !important;
+  }
+}

@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { useData } from '../../context/DataContext';
+import { MagneticButton } from '../Motion';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
@@ -199,9 +200,11 @@ const Navbar = () => {
                                 className={styles.searchInput}
                             />
 
-                            <button type="submit" className={styles.searchBtn} aria-label="Search">
-                                <Search size={18} />
-                            </button>
+                            <MagneticButton strength={0.25}>
+                                <button type="submit" className={styles.searchBtn} aria-label="Search">
+                                    <Search size={18} />
+                                </button>
+                            </MagneticButton>
                         </form>
 
                         {/* Search Live Suggestions */}
@@ -396,7 +399,15 @@ const Navbar = () => {
                         <Link to="/cart" className={styles.actionBtn} title="View Shopping Cart">
                             <div className={styles.actionIconBadge}>
                                 <ShoppingBag size={22} />
-                                <span className={styles.counterBadge}>{totalCartCount}</span>
+                                <motion.span 
+                                    key={totalCartCount}
+                                    initial={{ scale: 0.6 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ type: "spring", stiffness: 350, damping: 15 }}
+                                    className={styles.counterBadge}
+                                >
+                                    {totalCartCount}
+                                </motion.span>
                             </div>
                             <div className={styles.actionTextCol}>
                                 <span className={styles.actionSubtext}>Your Cart</span>
@@ -476,7 +487,18 @@ const Navbar = () => {
                                         isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink
                                     }
                                 >
-                                    {link.name}
+                                    {({ isActive }) => (
+                                        <>
+                                            <span>{link.name}</span>
+                                            {isActive && (
+                                                <motion.span 
+                                                    layoutId="navActiveGlider"
+                                                    className={styles.activeGlider}
+                                                    transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                                                />
+                                            )}
+                                        </>
+                                    )}
                                 </NavLink>
                             </li>
                         ))}

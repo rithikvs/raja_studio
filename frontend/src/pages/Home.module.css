@@ -62,11 +62,48 @@
     border-bottom: 1px solid var(--color-border);
 }
 
+.heroGlowOrb1 {
+    position: absolute;
+    top: -80px;
+    right: 12%;
+    width: 460px;
+    height: 460px;
+    background: radial-gradient(circle, rgba(217, 175, 69, 0.18) 0%, rgba(217, 175, 69, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.heroGlowOrb2 {
+    position: absolute;
+    bottom: -60px;
+    left: 8%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(6, 74, 59, 0.12) 0%, rgba(6, 74, 59, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .heroContainer {
     display: grid;
     grid-template-columns: 1.15fr 1fr;
     gap: 3.5rem;
     align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.heroTiltCard {
+    width: 100%;
+    border-radius: 24px;
+}
+
+.heroHeadingWrapper {
+    margin-bottom: 1.25rem;
 }
 
 .heroTextCol {
@@ -404,7 +441,28 @@
     margin-bottom: 3rem;
 }
 
+.categoryTiltCard {
+    height: 100%;
+    border-radius: var(--border-radius-card);
+}
+
+.categorySpotlight {
+    height: 100%;
+    border-radius: var(--border-radius-card);
+}
+
+.productTiltWrap {
+    height: 100%;
+    border-radius: var(--border-radius-card);
+}
+
+.productCardSpotlight {
+    height: 100%;
+    border-radius: var(--border-radius-card);
+}
+
 .tabBtn {
+    position: relative;
     background: #FFFFFF;
     border: 1.5px solid var(--color-border);
     padding: 0.65rem 1.6rem;
@@ -414,8 +472,18 @@
     font-weight: 600;
     color: var(--color-text-main);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), border-color var(--transition-fast);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+}
+
+.tabPillGlider {
+    position: absolute;
+    inset: 0;
+    background: var(--color-emerald-deep);
+    border-radius: 50px;
+    box-shadow: 0 6px 18px rgba(6, 74, 59, 0.25);
+    z-index: 1;
 }
 
 .tabBtn:hover {
@@ -424,10 +492,8 @@
 }
 
 .tabBtnActive {
-    background: var(--color-emerald-deep);
-    color: #FFFFFF;
+    color: #FFFFFF !important;
     border-color: var(--color-emerald-deep);
-    box-shadow: 0 6px 18px rgba(6, 78, 59, 0.22);
 }
 
 .productsGrid {

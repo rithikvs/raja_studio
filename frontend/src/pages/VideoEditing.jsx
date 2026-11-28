@@ -215,7 +215,7 @@ const VideoEditing = () => {
                                     className={styles.cardThumbnailWrapper}
                                     onClick={() => setActiveVideoModal(sample)}
                                 >
-                                    <img src={sample.thumbnail} alt={sample.title} className={sample.aspect.includes('9:16') ? styles.verticalImg : styles.cardThumbnail} />
+                                    <img src={sample.thumbnail} alt={sample.title} className={sample.aspect?.includes('9:16') ? styles.verticalImg : styles.cardThumbnail} />
                                     <div className={styles.thumbnailOverlay}>
                                         <div className={styles.playButtonCircle}>
                                             <Play size={24} className={styles.playGlyph} />
@@ -224,9 +224,11 @@ const VideoEditing = () => {
                                     <span className={styles.durationPill}>
                                         <Clock size={12} /> {sample.duration}
                                     </span>
-                                    <span className={styles.aspectPill}>
-                                        {sample.aspect}
-                                    </span>
+                                    {sample.aspect && (
+                                        <span className={styles.aspectPill}>
+                                            {sample.aspect}
+                                        </span>
+                                    )}
                                 </div>
 
                                 <div className={styles.sampleInfo}>
@@ -238,11 +240,13 @@ const VideoEditing = () => {
                                     <h3 className={styles.sampleTitle}>{sample.title}</h3>
                                     <p className={styles.sampleDesc}>{sample.description}</p>
 
-                                    <div className={styles.toolsRow}>
-                                        {sample.tools.map((t, idx) => (
-                                            <span key={idx} className={styles.toolTag}>#{t}</span>
-                                        ))}
-                                    </div>
+                                    {sample.tools && (
+                                        <div className={styles.toolsRow}>
+                                            {(Array.isArray(sample.tools) ? sample.tools : [sample.tools]).filter(Boolean).map((t, idx) => (
+                                                <span key={idx} className={styles.toolTag}>#{t}</span>
+                                            ))}
+                                        </div>
+                                    )}
 
                                     <div className={styles.sampleActions}>
                                         <button 
@@ -512,7 +516,7 @@ const VideoEditing = () => {
 
                                 <div className={styles.modalFooterActions}>
                                     <div className={styles.modalTags}>
-                                        {activeVideoModal.tools.map((tool, idx) => (
+                                        {activeVideoModal.tools && (Array.isArray(activeVideoModal.tools) ? activeVideoModal.tools : [activeVideoModal.tools]).filter(Boolean).map((tool, idx) => (
                                             <span key={idx} className={styles.modalToolTag}>#{tool}</span>
                                         ))}
                                     </div>

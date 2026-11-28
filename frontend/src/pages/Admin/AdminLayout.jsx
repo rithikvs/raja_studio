@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, Outlet, Navigate, useNavigate, Link } from 'react-router-dom';
 import { 
     LayoutDashboard, Package, Grid, ShoppingBag, Users, Tag, 
-    FileText, Home, LogOut, ShieldCheck, Film, Menu, X, ArrowLeft
+    FileText, Home, LogOut, ShieldCheck, Film, Menu, X, ArrowLeft, Cpu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import styles from './AdminLayout.module.css';
@@ -98,6 +98,10 @@ const AdminLayout = () => {
 
                     <NavLink to="/admin/cms" onClick={closeSidebarOnNavigate} className={({ isActive }) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}>
                         <FileText size={18} /> Website Content & CMS
+                    </NavLink>
+
+                    <NavLink to="/admin/services" onClick={closeSidebarOnNavigate} className={({ isActive }) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}>
+                        <Cpu size={18} /> Our Services & Machinery
                     </NavLink>
 
                     <NavLink to="/admin/media" onClick={closeSidebarOnNavigate} className={({ isActive }) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}>

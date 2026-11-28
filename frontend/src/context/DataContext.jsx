@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db, initDB } from '../services/db';
 import { api } from '../services/api';
+import { INITIAL_SERVICES, INITIAL_EQUIPMENT, INITIAL_MACHINERY_VIDEOS } from '../components/Services/servicesData';
 
 const DataContext = createContext();
 
@@ -13,6 +14,9 @@ export const DataProvider = ({ children }) => {
     const [cms, setCms] = useState(db.getCMS());
     const [videoSamples, setVideoSamples] = useState(db.getVideoSamples());
     const [designSamples, setDesignSamples] = useState(db.getDesignSamples());
+    const [services, setServices] = useState(INITIAL_SERVICES);
+    const [equipment, setEquipment] = useState(INITIAL_EQUIPMENT);
+    const [machineryVideos, setMachineryVideos] = useState(INITIAL_MACHINERY_VIDEOS);
 
     const refreshData = async () => {
         try {
@@ -88,6 +92,40 @@ export const DataProvider = ({ children }) => {
             }
         } catch {
             setDesignSamples(db.getDesignSamples());
+        }
+
+        // Fetch Services, Equipment & Machinery Videos
+        try {
+            const sRes = await api('/services').catch(() => null);
+            if (sRes?.services && sRes.services.length > 0) {
+                setServices(sRes.services);
+            } else {
+                setServices(INITIAL_SERVICES);
+            }
+        } catch {
+            setServices(INITIAL_SERVICES);
+        }
+
+        try {
+            const eqRes = await api('/services/equipment').catch(() => null);
+            if (eqRes?.equipment && eqRes.equipment.length > 0) {
+                setEquipment(eqRes.equipment);
+            } else {
+                setEquipment(INITIAL_EQUIPMENT);
+            }
+        } catch {
+            setEquipment(INITIAL_EQUIPMENT);
+        }
+
+        try {
+            const mvRes = await api('/services/videos').catch(() => null);
+            if (mvRes?.videos && mvRes.videos.length > 0) {
+                setMachineryVideos(mvRes.videos);
+            } else {
+                setMachineryVideos(INITIAL_MACHINERY_VIDEOS);
+            }
+        } catch {
+            setMachineryVideos(INITIAL_MACHINERY_VIDEOS);
         }
     };
 
@@ -311,6 +349,102 @@ export const DataProvider = ({ children }) => {
                 api(`/admin/designs/${id}`, { method: 'DELETE' }).catch(() => {});
                 db.deleteDesignSample(id);
                 setDesignSamples(prev => prev.filter(d => d.id !== id));
+            },
+            services,
+            equipment,
+            machineryVideos,
+            addService: async (serviceData) => {
+                try {
+                    const res = await api('/admin/services', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(serviceData)
+                    });
+                    const saved = res?.service || serviceData;
+                    setServices(prev => [saved, ...prev]);
+                    return saved;
+                } catch (err) {
+                    setServices(prev => [serviceData, ...prev]);
+                    return serviceData;
+                }
+            },
+            updateService: async (id, fields) => {
+                try {
+                    await api(`/admin/services/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(fields)
+                    });
+                } catch {}
+                setServices(prev => prev.map(s => (s.id === id || s._id === id) ? { ...s, ...fields } : s));
+            },
+            deleteService: async (id) => {
+                try {
+                    await api(`/admin/services/${id}`, { method: 'DELETE' });
+                } catch {}
+                setServices(prev => prev.filter(s => s.id !== id && s._id !== id));
+            },
+            addEquipment: async (item) => {
+                try {
+                    const res = await api('/admin/services/equipment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(item)
+                    });
+                    const saved = res?.equipment || item;
+                    setEquipment(prev => [saved, ...prev]);
+                    return saved;
+                } catch (err) {
+                    setEquipment(prev => [item, ...prev]);
+                    return item;
+                }
+            },
+            updateEquipment: async (id, fields) => {
+                try {
+                    await api(`/admin/services/equipment/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(fields)
+                    });
+                } catch {}
+                setEquipment(prev => prev.map(e => (e.id === id || e._id === id) ? { ...e, ...fields } : e));
+            },
+            deleteEquipment: async (id) => {
+                try {
+                    await api(`/admin/services/equipment/${id}`, { method: 'DELETE' });
+                } catch {}
+                setEquipment(prev => prev.filter(e => e.id !== id && e._id !== id));
+            },
+            addMachineryVideo: async (item) => {
+                try {
+                    const res = await api('/admin/services/videos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(item)
+                    });
+                    const saved = res?.video || item;
+                    setMachineryVideos(prev => [saved, ...prev]);
+                    return saved;
+                } catch (err) {
+                    setMachineryVideos(prev => [item, ...prev]);
+                    return item;
+                }
+            },
+            updateMachineryVideo: async (id, fields) => {
+                try {
+                    await api(`/admin/services/videos/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(fields)
+                    });
+                } catch {}
+                setMachineryVideos(prev => prev.map(v => (v.id === id || v._id === id) ? { ...v, ...fields } : v));
+            },
+            deleteMachineryVideo: async (id) => {
+                try {
+                    await api(`/admin/services/videos/${id}`, { method: 'DELETE' });
+                } catch {}
+                setMachineryVideos(prev => prev.filter(v => v.id !== id && v._id !== id));
             }
         }}>
             {children}

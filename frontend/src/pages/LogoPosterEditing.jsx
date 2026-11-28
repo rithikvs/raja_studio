@@ -216,19 +216,21 @@ const LogoPosterEditing = () => {
                                     </div>
 
                                     {/* Color Swatches */}
-                                    <div className={styles.paletteRow}>
-                                        <span className={styles.paletteLabel}>Palette:</span>
-                                        <div className={styles.swatches}>
-                                            {sample.colors.map((c, i) => (
-                                                <span 
-                                                    key={i} 
-                                                    className={styles.swatch} 
-                                                    style={{ backgroundColor: c }}
-                                                    title={c}
-                                                />
-                                            ))}
+                                    {sample.colors && (
+                                        <div className={styles.paletteRow}>
+                                            <span className={styles.paletteLabel}>Palette:</span>
+                                            <div className={styles.swatches}>
+                                                {(Array.isArray(sample.colors) ? sample.colors : [sample.colors]).map((c, i) => (
+                                                    <span 
+                                                        key={i} 
+                                                        className={styles.swatch} 
+                                                        style={{ backgroundColor: c }}
+                                                        title={c}
+                                                    />
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
 
                                     <div className={styles.cardActions}>
                                         <button 
@@ -498,17 +500,19 @@ const LogoPosterEditing = () => {
                                     </div>
                                 </div>
 
-                                <div className={styles.lightboxPalette}>
-                                    <strong>Color Harmony:</strong>
-                                    <div className={styles.lightboxSwatches}>
-                                        {activeLightbox.colors.map((c, i) => (
-                                            <div key={i} className={styles.lightboxSwatchItem}>
-                                                <span className={styles.swatchBox} style={{ backgroundColor: c }} />
-                                                <code>{c}</code>
-                                            </div>
-                                        ))}
+                                {activeLightbox.colors && (
+                                    <div className={styles.lightboxPalette}>
+                                        <strong>Color Harmony:</strong>
+                                        <div className={styles.lightboxSwatches}>
+                                            {(Array.isArray(activeLightbox.colors) ? activeLightbox.colors : [activeLightbox.colors]).map((c, i) => (
+                                                <div key={i} className={styles.lightboxSwatchItem}>
+                                                    <span className={styles.swatchBox} style={{ backgroundColor: c }} />
+                                                    <code>{c}</code>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 <div className={styles.lightboxFooter}>
                                     <a

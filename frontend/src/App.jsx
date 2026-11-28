@@ -50,6 +50,7 @@ import AdminCustomers from './pages/Admin/AdminCustomers';
 import AdminCoupons from './pages/Admin/AdminCoupons';
 import AdminCMS from './pages/Admin/AdminCMS';
 import AdminMedia from './pages/Admin/AdminMedia';
+import AdminServices from './pages/Admin/AdminServices';
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -140,6 +141,7 @@ function App() {
                                     <Route path="coupons" element={<AdminCoupons />} />
                                     <Route path="cms" element={<AdminCMS />} />
                                     <Route path="media" element={<AdminMedia />} />
+                                    <Route path="services" element={<AdminServices />} />
                                 </Route>
                             </Routes>
                             <LoginModal />

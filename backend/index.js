@@ -809,6 +809,171 @@ app.put('/api/cms', adminOrLocal, async (req, res) => {
         return fail(res, 500, 'Failed to save CMS data.');
     }
 });
+
+// ==========================================
+// OUR SERVICES, MACHINERY VIDEOS & EQUIPMENT
+// ==========================================
+
+const matchDocId = (param) => {
+    const filters = [{ id: param }];
+    if (param && ObjectId.isValid(param)) {
+        filters.push({ _id: new ObjectId(param) });
+    }
+    return { $or: filters };
+};
+
+// 1. Services Public Endpoints
+app.get('/api/services', async (_req, res) => {
+    try {
+        const services = await database.collection('services')
+            .find({ published: { $ne: false } })
+            .sort({ displayOrder: 1, created_at: -1 })
+            .toArray();
+        res.json({ services: services.map(s => ({ ...s, id: s.id || s._id.toString() })) });
+    } catch (err) {
+        console.error('Error fetching services:', err);
+        res.json({ services: [] });
+    }
+});
+
+// Equipment Public Endpoints (must be registered before :idOrSlug)
+app.get('/api/services/equipment', async (_req, res) => {
+    try {
+        const equipment = await database.collection('service_equipment')
+            .find({ published: { $ne: false } })
+            .sort({ displayOrder: 1, created_at: -1 })
+            .toArray();
+        res.json({ equipment: equipment.map(e => ({ ...e, id: e.id || e._id.toString() })) });
+    } catch (err) {
+        res.json({ equipment: [] });
+    }
+});
+
+// Machinery Videos Public Endpoints (must be registered before :idOrSlug)
+app.get('/api/services/videos', async (_req, res) => {
+    try {
+        const videos = await database.collection('machinery_videos')
+            .find({ published: { $ne: false } })
+            .sort({ displayOrder: 1, created_at: -1 })
+            .toArray();
+        res.json({ videos: videos.map(v => ({ ...v, id: v.id || v._id.toString() })) });
+    } catch (err) {
+        res.json({ videos: [] });
+    }
+});
+
+app.get('/api/services/:idOrSlug', async (req, res) => {
+    try {
+        const param = req.params.idOrSlug;
+        const query = { $or: [{ slug: param }, { id: param }] };
+        if (param && ObjectId.isValid(param)) {
+            query.$or.push({ _id: new ObjectId(param) });
+        }
+        const service = await database.collection('services').findOne(query);
+        if (!service) return fail(res, 404, 'Service not found');
+        res.json({ service: { ...service, id: service.id || service._id.toString() } });
+    } catch (err) {
+        fail(res, 500, 'Failed to fetch service');
+    }
+});
+
+// 2. Services Admin Endpoints
+app.post('/api/admin/services', adminOrLocal, async (req, res) => {
+    try {
+        const service = { ...req.body, created_at: new Date(), updated_at: new Date() };
+        if (!service.id) service.id = service.slug || crypto.randomUUID();
+        delete service._id;
+        const result = await database.collection('services').insertOne(service);
+        res.status(201).json({ service: { ...service, _id: result.insertedId } });
+    } catch (err) {
+        fail(res, 500, 'Failed to create service: ' + err.message);
+    }
+});
+
+app.put('/api/admin/services/:id', adminOrLocal, async (req, res) => {
+    try {
+        const { _id, ...fields } = req.body;
+        fields.updated_at = new Date();
+        await database.collection('services').updateOne(matchDocId(req.params.id), { $set: fields });
+        res.json({ ok: true });
+    } catch (err) {
+        fail(res, 500, 'Failed to update service: ' + err.message);
+    }
+});
+
+app.delete('/api/admin/services/:id', adminOrLocal, async (req, res) => {
+    try {
+        await database.collection('services').deleteOne(matchDocId(req.params.id));
+        res.json({ ok: true });
+    } catch (err) {
+        fail(res, 500, 'Failed to delete service');
+    }
+});
+
+// 3. Equipment Admin Endpoints
+app.post('/api/admin/services/equipment', adminOrLocal, async (req, res) => {
+    try {
+        const item = { ...req.body, created_at: new Date(), updated_at: new Date() };
+        if (!item.id) item.id = crypto.randomUUID();
+        delete item._id;
+        const result = await database.collection('service_equipment').insertOne(item);
+        res.status(201).json({ equipment: { ...item, _id: result.insertedId } });
+    } catch (err) {
+        fail(res, 500, 'Failed to create equipment');
+    }
+});
+
+app.put('/api/admin/services/equipment/:id', adminOrLocal, async (req, res) => {
+    try {
+        const { _id, ...fields } = req.body;
+        fields.updated_at = new Date();
+        await database.collection('service_equipment').updateOne(matchDocId(req.params.id), { $set: fields });
+        res.json({ ok: true });
+    } catch (err) {
+        fail(res, 500, 'Failed to update equipment');
+    }
+});
+
+app.delete('/api/admin/services/equipment/:id', adminOrLocal, async (req, res) => {
+    try {
+        await database.collection('service_equipment').deleteOne(matchDocId(req.params.id));
+        res.json({ ok: true });
+    } catch (err) {
+        fail(res, 500, 'Failed to delete equipment');
+    }
+});
+
+app.post('/api/admin/services/videos', adminOrLocal, async (req, res) => {
+    try {
+        const item = { ...req.body, created_at: new Date(), updated_at: new Date() };
+        if (!item.id) item.id = crypto.randomUUID();
+        delete item._id;
+        const result = await database.collection('machinery_videos').insertOne(item);
+        res.status(201).json({ video: { ...item, _id: result.insertedId } });
+    } catch (err) {
+        fail(res, 500, 'Failed to add machinery video');
+    }
+});
+
+app.put('/api/admin/services/videos/:id', adminOrLocal, async (req, res) => {
+    try {
+        const { _id, ...fields } = req.body;
+        fields.updated_at = new Date();
+        await database.collection('machinery_videos').updateOne(matchDocId(req.params.id), { $set: fields });
+        res.json({ ok: true });
+    } catch (err) {
+        fail(res, 500, 'Failed to update machinery video');
+    }
+});
+
+app.delete('/api/admin/services/videos/:id', adminOrLocal, async (req, res) => {
+    try {
+        await database.collection('machinery_videos').deleteOne(matchDocId(req.params.id));
+        res.json({ ok: true });
+    } catch (err) {
+        fail(res, 500, 'Failed to delete machinery video');
+    }
+});
 app.use((error, _req, res, next) => { 
     void next; 
     console.error('Server error:', error);

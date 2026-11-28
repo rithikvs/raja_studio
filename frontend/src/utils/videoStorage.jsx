@@ -134,7 +134,7 @@ function getApiBaseUrl() {
  * Upload a video file to the backend server with real-time upload progress.
  * If backend is offline or fails, automatically falls back to IndexedDB.
  */
-export function uploadVideoWithProgress(file, onProgress) {
+export function uploadVideoWithProgress(file, onProgress, folder = 'videos') {
     return new Promise((resolve, reject) => {
         if (!file) return reject(new Error('No video file selected.'));
 
@@ -144,6 +144,9 @@ export function uploadVideoWithProgress(file, onProgress) {
         const xhr = new XMLHttpRequest();
         const formData = new FormData();
         formData.append('file', file);
+        if (folder) {
+            formData.append('folder', folder);
+        }
 
         xhr.open('POST', targetUrl, true);
         if (token) {
@@ -325,8 +328,38 @@ export function extractVideoMetadataAndThumbnail(file) {
 }
 
 /**
+ * Extract YouTube ID from standard or shortened URLs
+ */
+export function getYouTubeId(url) {
+    if (!url || typeof url !== 'string') return null;
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    return match ? match[1] : null;
+}
+
+/**
+ * Extract Vimeo ID from URL
+ */
+export function getVimeoId(url) {
+    if (!url || typeof url !== 'string') return null;
+    const match = url.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/);
+    return match ? match[1] : null;
+}
+
+/**
+ * Auto-detect YouTube/Vimeo thumbnail
+ */
+export function getAutoThumbnail(url) {
+    const ytId = getYouTubeId(url);
+    if (ytId) {
+        return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+    }
+    return '';
+}
+
+/**
  * Universal Safe Video Player Component
- * Automatically resolves regular URLs, Blob URLs, and IndexedDB local video URLs.
+ * Automatically resolves regular URLs, Blob URLs, IndexedDB local video URLs,
+ * and seamlessly embeds YouTube and Vimeo streams.
  */
 export const SafeVideo = ({ src, poster, controls = true, className, autoPlay = false, playsInline = true, ...props }) => {
     const [resolvedSrc, setResolvedSrc] = useState(src || '');
@@ -346,6 +379,34 @@ export const SafeVideo = ({ src, poster, controls = true, className, autoPlay = 
             isMounted = false;
         };
     }, [src]);
+
+    const ytId = getYouTubeId(resolvedSrc);
+    if (ytId) {
+        return (
+            <iframe
+                src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=${autoPlay ? 1 : 0}&rel=0&modestbranding=1`}
+                title="Video player"
+                className={className}
+                style={{ width: '100%', height: '100%', border: 0, minHeight: '220px', borderRadius: '12px' }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+            />
+        );
+    }
+
+    const vimeoId = getVimeoId(resolvedSrc);
+    if (vimeoId) {
+        return (
+            <iframe
+                src={`https://player.vimeo.com/video/${vimeoId}?autoplay=${autoPlay ? 1 : 0}`}
+                title="Vimeo video player"
+                className={className}
+                style={{ width: '100%', height: '100%', border: 0, minHeight: '220px', borderRadius: '12px' }}
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+            />
+        );
+    }
 
     return (
         <video 

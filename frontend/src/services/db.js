@@ -238,8 +238,8 @@ export const defaultVideoSamples = [
         duration: '01:45',
         resolution: '4K UHD • 60 FPS',
         aspect: '16:9 Cinema',
-        thumbnail: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        thumbnail: '/samples/thumbnails/thumb-wedding-teaser.jpg',
+        videoUrl: '/service-videos/laser-cutting.mp4',
         description: 'Cinematic color grading with soft film glow, emotional violin sound design, slow-motion drone sweeps, and bespoke typography for royal vows.',
         tools: ['Premiere Pro', 'DaVinci Resolve', 'Sound FX']
     },
@@ -251,7 +251,7 @@ export const defaultVideoSamples = [
         resolution: '4K UHD • 60 FPS',
         aspect: '16:9 Cinema',
         thumbnail: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&auto=format&fit=crop&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+        videoUrl: '/service-videos/uv-printing.mp4',
         description: 'Nostalgic photo-to-video montage transition with vintage light leaks, restored old photographs, and heartwarming narration sync.',
         tools: ['After Effects', 'Photo Restoration', 'Audio Clean']
     },
@@ -263,7 +263,7 @@ export const defaultVideoSamples = [
         resolution: '1080p FHD',
         aspect: '9:16 Reel / 16:9',
         thumbnail: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&auto=format&fit=crop&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+        videoUrl: '/service-videos/laptop-service.mp4',
         description: 'Uplifting joyful rhythm cuts synced with baby laughter, confetti burst motion graphics, and animated cartoon name title cards.',
         tools: ['Premiere Pro', 'Motion Graphics', 'Beat Sync']
     },
@@ -275,7 +275,7 @@ export const defaultVideoSamples = [
         resolution: '4K UHD • 60 FPS',
         aspect: '9:16 Vertical Reel',
         thumbnail: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&auto=format&fit=crop&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4',
+        videoUrl: '/service-videos/live-streaming.mp4',
         description: 'Crisp macro b-roll, satisfying ASMR ribbon cuts, gold particle sparkles, and upbeat acoustic background music.',
         tools: ['Macro Focus', 'Color Grading', 'ASMR Audio']
     },
@@ -286,8 +286,8 @@ export const defaultVideoSamples = [
         duration: '00:45',
         resolution: '4K UHD • 60 FPS',
         aspect: '9:16 Vertical Reel',
-        thumbnail: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&auto=format&fit=crop&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+        thumbnail: '/samples/thumbnails/thumb-laser-cutting.jpg',
+        videoUrl: '/service-videos/laser-cutting.mp4',
         description: 'Dark ambient room reveal, glowing LED illumination zoom, emotional music swell, and personalized customer reaction caption.',
         tools: ['Light FX', 'LUT Master', 'DaVinci Resolve']
     },
@@ -299,7 +299,7 @@ export const defaultVideoSamples = [
         resolution: '1080p FHD • 60 FPS',
         aspect: '9:16 Instagram Reel',
         thumbnail: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&auto=format&fit=crop&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+        videoUrl: '/service-videos/uv-printing.mp4',
         description: 'High-energy quick cuts, trending sound sync, kinetic animated typography, seamless swipe transitions, and high-retention pacing.',
         tools: ['Kinetic Type', 'Trending Audio', 'Reel Optimization']
     },
@@ -310,8 +310,8 @@ export const defaultVideoSamples = [
         duration: '02:00',
         resolution: '4K UHD • Cinema Scope',
         aspect: '21:9 Widescreen',
-        thumbnail: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
+        thumbnail: '/samples/thumbnails/thumb-uv-printing.jpg',
+        videoUrl: '/service-videos/uv-printing.mp4',
         description: 'Behind-the-scenes craftsman footage, voiceover mixing, orchestral backing score, corporate lower thirds, and studio logo animation.',
         tools: ['Voiceover EQ', 'Color Match', 'Premiere Pro']
     },
@@ -323,7 +323,7 @@ export const defaultVideoSamples = [
         resolution: '4K UHD • 60 FPS',
         aspect: '16:9 Cinema',
         thumbnail: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800&auto=format&fit=crop&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4',
+        videoUrl: '/service-videos/laser-cutting.mp4',
         description: 'Sunset beach setting, drone aerial approach, live audio capture enhancement, and soft golden hour color grading.',
         tools: ['Drone Footage', 'Audio Cleanup', '4K Master']
     }
@@ -337,7 +337,7 @@ export const defaultDesignSamples = [
         format: 'Vector AI, SVG, High-Res PNG',
         dimensions: 'Infinite Scalability',
         style: 'Gold Foil & Deep Emerald',
-        image: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&auto=format&fit=crop&q=80',
+        image: '/samples/logos/royal-crest.jpg',
         description: 'Custom intertwined serif monogram with heraldic lion emblems, sculpted royal crown, and champagne gold metallic finish for luxury boutiques and jewelry houses.',
         colors: ['#064E3B', '#D4AF37', '#145A42', '#FFFDF5']
     },
@@ -348,7 +348,7 @@ export const defaultDesignSamples = [
         format: 'Vector AI, EPS, SVG, WebP',
         dimensions: 'Square & Horizontal Lockups',
         style: 'Modern Minimalist Luxury',
-        image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+        image: '/samples/logos/luxury-boutique-monogram.jpg',
         description: 'Refined geometric gift box silhouette intertwined with clean editorial serif typography. Balanced spacing and timeless symmetry.',
         colors: ['#0B3D2E', '#D4AF37', '#F5C542', '#FFFFFF']
     },
@@ -359,7 +359,7 @@ export const defaultDesignSamples = [
         format: 'Print-Ready PDF (300 DPI) & JPG',
         dimensions: 'A3 (11.7 x 16.5 in) & Instagram 4:5',
         style: 'Dramatic Contrast & Gold Accents',
-        image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop&q=80',
+        image: '/samples/posters/gala-night-classical.jpg',
         description: 'High-impact editorial event poster with dark atmospheric lighting, bold serif headlines, gold foil accent ribbons, and clean sponsor footer layout.',
         colors: ['#09090b', '#D4AF37', '#F59E0B', '#F8FAFC']
     },
@@ -370,7 +370,7 @@ export const defaultDesignSamples = [
         format: 'Digital Social (1080x1080) & Story (1080x1920)',
         dimensions: '1:1 Square & 9:16 Vertical',
         style: 'Golden Sparkles & Traditional Festive',
-        image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=800&auto=format&fit=crop&q=80',
+        image: '/samples/posters/festival-lights-celebration.jpg',
         description: 'Warm glowing diya illustrations, intricate golden mandala borders, festive calligraphy, and customizable gift voucher discount tags.',
         colors: ['#78350F', '#F59E0B', '#D4AF37', '#FEF3C7']
     },
@@ -381,7 +381,7 @@ export const defaultDesignSamples = [
         format: 'Die-Cut Vector PDF & Mockup',
         dimensions: 'Custom Die-Cut Jar & Box Sleeves',
         style: 'Apothecary Luxury & Organic Floral',
-        image: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?w=800&auto=format&fit=crop&q=80',
+        image: '/samples/logos/modern-typography-badge.jpg',
         description: 'Delicate fine-line hand-drawn lavender and rose botanicals paired with embossed gold hot-stamp foil text for luxury gifting boxes.',
         colors: ['#064E3B', '#D4AF37', '#E2E8F0', '#FFFDF5']
     },
@@ -392,7 +392,7 @@ export const defaultDesignSamples = [
         format: 'Print Ready PDF & Digital Invitation',
         dimensions: '5 x 7 in Double-Sided',
         style: 'Silver Foil & Pearl White Calligraphy',
-        image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&auto=format&fit=crop&q=80',
+        image: '/samples/posters/wedding-announcement-poster.jpg',
         description: 'Embossed couple monogram, romantic script typography, QR code for RSVP/live location, and matching thank you gift tags.',
         colors: ['#334155', '#94A3B8', '#D4AF37', '#FFFFFF']
     },
@@ -403,7 +403,7 @@ export const defaultDesignSamples = [
         format: 'Print PDF & WhatsApp Invite PNG',
         dimensions: 'A4 & Mobile Wallpaper',
         style: 'Neon Glow & Electric Typography',
-        image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format&fit=crop&q=80',
+        image: '/samples/posters/theater-film-release.jpg',
         description: 'Vibrant neon lettering, photo cutout integration of the birthday star, disco lighting flares, and celebration party schedule breakdown.',
         colors: ['#0B132B', '#10B981', '#F59E0B', '#EC4899']
     },
@@ -414,7 +414,7 @@ export const defaultDesignSamples = [
         format: 'Laser Vector DXF, SVG & PDF',
         dimensions: '12x12 in Circular & Custom Cut',
         style: 'Laser Engraved Precision',
-        image: 'https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=800&auto=format&fit=crop&q=80',
+        image: '/samples/logos/vintage-heraldic-emblem.jpg',
         description: 'High-precision circular artwork designed for laser engraving and UV printing on acrylic, wood, and metal clocks with personalized dedication text.',
         colors: ['#1E293B', '#D4AF37', '#F8FAFC', '#E2E8F0']
     }

@@ -25,7 +25,11 @@ export const R2_FOLDERS = {
     LOGOS: 'logos',
     PORTFOLIO: 'portfolio',
     WEBSITE_ASSETS: 'website-assets',
-    CUSTOMER_UPLOADS: 'customer-uploads'
+    CUSTOMER_UPLOADS: 'customer-uploads',
+    SERVICES: 'services',
+    SERVICES_MACHINERY: 'services/machinery',
+    SERVICES_THUMBNAILS: 'services/thumbnails',
+    VIDEO_EDITING: 'video-editing/samples'
 };
 
 export function getR2Config() {

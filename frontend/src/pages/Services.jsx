@@ -15,12 +15,12 @@ import { INITIAL_SERVICES, INITIAL_MACHINERY_VIDEOS, INITIAL_EQUIPMENT } from '.
 import styles from './Services.module.css';
 
 const Services = () => {
-    const { cms } = useData();
+    const { cms, services: ctxServices, machineryVideos: ctxVideos, equipment: ctxEquipment } = useData();
 
-    // Data source (defaults to verified INITIAL_*, ready to be overridden by live DB/CMS when backend connects)
-    const [servicesList, setServicesList] = useState(INITIAL_SERVICES);
-    const [machineryVideos, setMachineryVideos] = useState(INITIAL_MACHINERY_VIDEOS);
-    const [equipmentList, setEquipmentList] = useState(INITIAL_EQUIPMENT);
+    // Live data from MongoDB API with instant verified fallback
+    const servicesList = (ctxServices && ctxServices.length > 0) ? ctxServices : INITIAL_SERVICES;
+    const machineryVideos = (ctxVideos && ctxVideos.length > 0) ? ctxVideos : INITIAL_MACHINERY_VIDEOS;
+    const equipmentList = (ctxEquipment && ctxEquipment.length > 0) ? ctxEquipment : INITIAL_EQUIPMENT;
 
     // Modal state
     const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);

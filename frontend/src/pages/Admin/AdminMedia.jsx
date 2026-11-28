@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
     Film, Palette, Image as ImageIcon, Plus, Edit2, Trash2, 
     Upload, Play, Eye, CheckCircle, Save, X, RefreshCw, 
-    Clock, MonitorPlay, Sparkles, Layers, Sliders, ExternalLink
+    Clock, MonitorPlay, Sparkles, Layers, Sliders, ExternalLink, Video, Cpu
 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { compressImage, uploadImageFile, uploadBase64Image } from '../../utils/imageUtils';
@@ -215,7 +216,7 @@ const AdminMedia = () => {
                 } else {
                     setUploadStatusMsg('Processing & finalizing video stream...');
                 }
-            });
+            }, 'video-editing/samples');
 
             setVideoForm(prev => ({
                 ...prev,
@@ -431,6 +432,15 @@ const AdminMedia = () => {
                     <ImageIcon size={18} />
                     <span>Brand Logo & Website Banners</span>
                 </button>
+
+                <Link 
+                    to="/admin/services" 
+                    className={styles.tabBtn} 
+                    style={{ textDecoration: 'none', marginLeft: 'auto', background: '#fdfbf7', borderColor: 'var(--color-champagne-gold)', color: 'var(--color-emerald-deep)' }}
+                >
+                    <Cpu size={18} color="var(--color-emerald-deep)" />
+                    <span>Our Services & Machinery Hub →</span>
+                </Link>
             </div>
 
             {/* =========================================================

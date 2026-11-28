@@ -90,6 +90,7 @@ const Navbar = () => {
     const navLinks = [
         { name: 'Home', path: '/' },
         { name: 'Shop', path: '/shop' },
+        { name: 'Our Services', path: '/services' },
         { name: 'Personalized Gifts', path: '/personalized-gifts' },
         { name: 'Video Editing', path: '/video-editing' },
         { name: 'Logo & Posters', path: '/logo-poster-editing' },

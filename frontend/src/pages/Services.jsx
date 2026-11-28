@@ -1,186 +1,194 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Camera, Printer, Sparkles, Package, Truck, ShieldCheck, Heart, Palette } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { 
+    Sparkles, ShieldCheck, Clock, Award, Phone, MessageSquare, 
+    Layers, ArrowRight, ExternalLink, Cpu, CheckCircle2 
+} from 'lucide-react';
 import { useData } from '../context/DataContext';
+import { PageTransition, StaggerReveal, StaggerItem, AnimatedSection } from '../components/Motion';
+import ServicesHero from '../components/Services/ServicesHero';
+import ServiceCategoryCard from '../components/Services/ServiceCategoryCard';
+import MachineryVideoGallery from '../components/Services/MachineryVideoGallery';
+import EquipmentShowcase from '../components/Services/EquipmentShowcase';
+import ServiceEnquiryModal from '../components/Services/ServiceEnquiryModal';
+import { INITIAL_SERVICES, INITIAL_MACHINERY_VIDEOS, INITIAL_EQUIPMENT } from '../components/Services/servicesData';
 import styles from './Services.module.css';
 
 const Services = () => {
     const { cms } = useData();
 
-    const services = [
-        {
-            icon: <Camera size={48} />,
-            title: 'Photo Printing',
-            description: 'High-resolution HD photo printing on premium quality paper with vivid colors and sharp details.',
-            features: ['Studio-grade printing', 'Multiple paper types', 'UV resistant', 'Long-lasting prints']
-        },
-        {
-            icon: <Palette size={48} />,
-            title: 'Custom Framing',
-            description: 'Handcrafted wooden and synthetic frames in various sizes, colors, and finishes.',
-            features: ['Wooden frames', 'Acrylic frames', 'Multiple colors', 'Custom sizes']
-        },
-        {
-            icon: <Sparkles size={48} />,
-            title: 'Photo Customization',
-            description: 'Add custom text, apply filters, and enhance your photos before printing.',
-            features: ['Text engraving', 'Photo editing', 'Color correction', 'Background removal']
-        },
-        {
-            icon: <Heart size={48} />,
-            title: 'Gift Packaging',
-            description: 'Premium gift wrapping and packaging services for special occasions.',
-            features: ['Gift wrapping', 'Greeting cards', 'Custom messages', 'Bulk orders']
-        },
-        {
-            icon: <Printer size={48} />,
-            title: 'Bulk Orders',
-            description: 'Special pricing and services for corporate orders, events, and bulk printing.',
-            features: ['Corporate gifts', 'Event photography', 'Bulk discounts', 'Priority processing']
-        },
-        {
-            icon: <Package size={48} />,
-            title: 'Photo Restoration',
-            description: 'Restore and enhance old damaged photos with our professional editing services.',
-            features: ['Damage repair', 'Color restoration', 'Scratch removal', 'Digital archiving']
-        }
-    ];
+    // Data source (defaults to verified INITIAL_*, ready to be overridden by live DB/CMS when backend connects)
+    const [servicesList, setServicesList] = useState(INITIAL_SERVICES);
+    const [machineryVideos, setMachineryVideos] = useState(INITIAL_MACHINERY_VIDEOS);
+    const [equipmentList, setEquipmentList] = useState(INITIAL_EQUIPMENT);
 
-    const process = [
-        {
-            step: '01',
-            title: 'Choose Service',
-            description: 'Select the service you need from our catalog'
-        },
-        {
-            step: '02',
-            title: 'Upload Photos',
-            description: 'Upload your high-resolution photos securely'
-        },
-        {
-            step: '03',
-            title: 'Customize',
-            description: 'Select options like size, frame, finish, and text'
-        },
-        {
-            step: '04',
-            title: 'Review & Order',
-            description: 'Review your customization and place your order'
-        },
-        {
-            step: '05',
-            title: 'Production',
-            description: 'We print, frame, and pack your order carefully'
-        },
-        {
-            step: '06',
-            title: 'Delivery',
-            description: 'Fast doorstep delivery with tracking'
+    // Modal state
+    const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
+    const [selectedServiceForEnquiry, setSelectedServiceForEnquiry] = useState(null);
+
+    const handleOpenEnquiry = (service = null) => {
+        setSelectedServiceForEnquiry(service);
+        setEnquiryModalOpen(true);
+    };
+
+    const handleWatchVideo = (service) => {
+        // Smooth scroll to machinery video gallery
+        const gallery = document.getElementById('machinery-gallery');
+        if (gallery) {
+            gallery.scrollIntoView({ behavior: 'smooth' });
         }
-    ];
+    };
+
+    const scrollToCategories = () => {
+        const el = document.getElementById('services-categories');
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    const scrollToGallery = () => {
+        const el = document.getElementById('machinery-gallery');
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     return (
-        <div className={styles.servicesPage}>
-            {/* Hero Section */}
-            <div className={styles.pageHeader}>
-                <div className="container">
-                    <h1>Our Services</h1>
-                    <p>Professional photo printing, framing, and customization services</p>
-                </div>
-            </div>
+        <PageTransition>
+            <div className={styles.servicesPageWrapper}>
+                {/* 1. CINEMATIC HERO SECTION */}
+                <ServicesHero 
+                    onOpenEnquiry={handleOpenEnquiry}
+                    onExploreClick={scrollToCategories}
+                    onWatchWorkClick={scrollToGallery}
+                />
 
-            {/* Services Grid */}
-            <section className="section-padding">
-                <div className="container">
-                    <h2 className="section-title text-center">What We Offer</h2>
-                    <p className="section-subtitle text-center">
-                        Complete photo customization and personalized gift creation services
-                    </p>
+                {/* 2. CORE SERVICE CATEGORIES SECTION */}
+                <section id="services-categories" className={styles.categoriesSection}>
+                    <div className="container">
+                        <div className={styles.sectionHeader}>
+                            <div className={styles.eyebrowBadge}>
+                                <Sparkles size={14} className={styles.goldIcon} />
+                                <span>COMPREHENSIVE CAPABILITIES</span>
+                            </div>
+                            <h2 className={styles.sectionHeading}>
+                                Specialized Production &amp; <span className={styles.goldText}>Creative Services</span>
+                            </h2>
+                            <p className={styles.sectionSubtext}>
+                                Every discipline is executed in-house with dedicated industrial machinery, certified technicians, and museum-grade quality standards.
+                            </p>
+                        </div>
 
-                    <div className={styles.servicesGrid}>
-                        {services.map((service, idx) => (
-                            <div key={idx} className={styles.serviceCard}>
-                                <div className={styles.iconWrapper}>
-                                    {service.icon}
+                        {/* Responsive Services Grid */}
+                        <div className={styles.servicesGrid}>
+                            {servicesList.map((service, index) => (
+                                <motion.div 
+                                    key={service.id || index}
+                                    initial={{ opacity: 0, y: 25 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true, amount: 0.1 }}
+                                    transition={{ duration: 0.6, delay: (index % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                                >
+                                    <ServiceCategoryCard
+                                        service={service}
+                                        onEnquire={handleOpenEnquiry}
+                                        onWatchVideo={handleWatchVideo}
+                                    />
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* 3. MACHINERY IN ACTION — FEATURED VIDEO GALLERY */}
+                <MachineryVideoGallery videos={machineryVideos} />
+
+                {/* 4. HARDWARE & EQUIPMENT SHOWCASE */}
+                <EquipmentShowcase 
+                    equipmentList={equipmentList}
+                    onEnquireEquipment={(eq) => handleOpenEnquiry({ title: `${eq.name} (${eq.category})`, enquiryType: 'printing' })}
+                />
+
+                {/* 5. STUDIO PILLARS OF EXCELLENCE */}
+                <section className={styles.pillarsSection}>
+                    <div className="container">
+                        <div className={styles.pillarsGrid}>
+                            <div className={styles.pillarCard}>
+                                <div className={styles.pillarIcon}>
+                                    <Cpu size={32} />
                                 </div>
-                                <h3>{service.title}</h3>
-                                <p className={styles.description}>{service.description}</p>
-                                <ul className={styles.featuresList}>
-                                    {service.features.map((feature, i) => (
-                                        <li key={i}>✓ {feature}</li>
-                                    ))}
-                                </ul>
+                                <h3>Direct Workshop Control</h3>
+                                <p>We don't outsource. All UV printing, laser profiling, and fine-art framing take place on our own shop floor in Rajapalayam.</p>
                             </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
 
-            {/* Process Section */}
-            <section className="section-padding" style={{ background: '#f9fafb' }}>
-                <div className="container">
-                    <h2 className="section-title text-center">How It Works</h2>
-                    <p className="section-subtitle text-center">
-                        Simple 6-step process from order to delivery
-                    </p>
-
-                    <div className={styles.processGrid}>
-                        {process.map((item, idx) => (
-                            <div key={idx} className={styles.processStep}>
-                                <div className={styles.stepNumber}>{item.step}</div>
-                                <h3>{item.title}</h3>
-                                <p>{item.description}</p>
+                            <div className={styles.pillarCard}>
+                                <div className={styles.pillarIcon}>
+                                    <Award size={32} />
+                                </div>
+                                <h3>Archival Grade Materials</h3>
+                                <p>Genuine UV LED pigments, fade-proof Epson inks, and optical cast acrylic guaranteed to retain color fidelity for years.</p>
                             </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
 
-            {/* Features Section */}
-            <section className="section-padding">
-                <div className="container">
-                    <h2 className="section-title text-center">Why Choose Us</h2>
-                    <div className={styles.featuresGrid}>
-                        <div className={styles.feature}>
-                            <Truck size={40} color="#D4AF37" />
-                            <h3>Fast Delivery</h3>
-                            <p>Express shipping available for urgent orders with safe packaging</p>
-                        </div>
-                        <div className={styles.feature}>
-                            <ShieldCheck size={40} color="#D4AF37" />
-                            <h3>Quality Guarantee</h3>
-                            <p>100% satisfaction guaranteed or full refund on defective products</p>
-                        </div>
-                        <div className={styles.feature}>
-                            <Sparkles size={40} color="#D4AF37" />
-                            <h3>HD Printing</h3>
-                            <p>Studio-grade printers ensure vibrant colors and sharp details</p>
-                        </div>
-                        <div className={styles.feature}>
-                            <Heart size={40} color="#D4AF37" />
-                            <h3>Affordable Pricing</h3>
-                            <p>Competitive prices with special discounts on bulk orders</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                            <div className={styles.pillarCard}>
+                                <div className={styles.pillarIcon}>
+                                    <Clock size={32} />
+                                </div>
+                                <h3>Prompt Turnaround</h3>
+                                <p>From single prototype personalized gifts to bulk corporate batches and weekend event coverages, we honor your schedules.</p>
+                            </div>
 
-            {/* CTA Section */}
-            <section className={styles.ctaSection}>
-                <div className="container text-center">
-                    <h2>Ready to Get Started?</h2>
-                    <p>Browse our products and start creating your personalized gifts today</p>
-                    <div className={styles.ctaButtons}>
-                        <Link to="/shop" className={styles.primaryBtn}>
-                            Browse Products
-                        </Link>
-                        <Link to="/contact" className={styles.secondaryBtn}>
-                            Contact Us
-                        </Link>
+                            <div className={styles.pillarCard}>
+                                <div className={styles.pillarIcon}>
+                                    <ShieldCheck size={32} />
+                                </div>
+                                <h3>Consultative Service</h3>
+                                <p>Unsure whether your artwork needs UV curing or laser engraving? Our technical artisans advise you on the optimal finish.</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </section>
-        </div>
+                </section>
+
+                {/* 6. CALL TO ACTION BANNER */}
+                <section className={styles.ctaBannerSection}>
+                    <div className="container">
+                        <div className={styles.ctaBannerBox}>
+                            <div className={styles.ctaContent}>
+                                <span className={styles.ctaEyebrow}>START YOUR PROJECT TODAY</span>
+                                <h2>Have a Custom Design or Special Event in Mind?</h2>
+                                <p>Talk directly with our fabrication engineers and cinematographers to receive an accurate timeline and estimate.</p>
+                                
+                                <div className={styles.ctaButtonsGroup}>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => handleOpenEnquiry(null)}
+                                        className={styles.ctaPrimaryBtn}
+                                    >
+                                        <span>Request a Custom Quote</span>
+                                        <ArrowRight size={18} />
+                                    </button>
+                                    <a 
+                                        href="https://wa.me/917708552461?text=Hello%20Raja%20Studios,%20I%20would%20like%20to%20enquire%20about%20your%20services."
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className={styles.ctaWhatsAppBtn}
+                                    >
+                                        <MessageSquare size={18} />
+                                        <span>Chat on WhatsApp</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Contextual Enquiry Modal */}
+                <ServiceEnquiryModal
+                    isOpen={enquiryModalOpen}
+                    onClose={() => setEnquiryModalOpen(false)}
+                    selectedService={selectedServiceForEnquiry}
+                />
+            </div>
+        </PageTransition>
     );
 };
 

@@ -691,7 +691,9 @@
 }
 
 .navLinkActive {
-    color: var(--color-golden-yellow);
+    color: #FDE68A !important;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(217, 175, 69, 0.5);
 }
 
 .activeGlider {
